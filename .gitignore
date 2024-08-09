@@ -1,0 +1,7 @@
+data-raw/*.csv
+data-raw/*.rds
+
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
