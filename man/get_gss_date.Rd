@@ -20,3 +20,7 @@ earliest and latest dates that the gss codeset was operational.
 Returns the date range during which all of the gss codes in a dataframe were
 operational
 }
+\details{
+Note that 2018 codes will return as 2013 as they are the same as 2013 codes,
+only some of the gss names have changed and this doesn't check names.
+}

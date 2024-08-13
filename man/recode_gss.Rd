@@ -21,7 +21,8 @@ recode_gss(
 \code{gss_code}).}
 
 \item{data_cols}{A string or character vector. The column(s) that contain the
-data to be aggregated. Defaults to last column of input dataframe.}
+data to be aggregated. Defaults to last column of input dataframe. At least 
+one data column must be specified.}
 
 \item{fun}{Character Function to be applied in aggregating data. Either 'sum'
 or 'mean'. Default \code{'sum'}.}
@@ -33,9 +34,6 @@ or 'mean'. Default \code{'sum'}.}
 \item{aggregate_data}{Logical. If set to true multiple instances of the same
 gss code will be aggregated using the function specified in \code{fun} parameter.
 Default to \code{TRUE}.}
-
-\item{code_changes_path}{string. file path to the code changes database or NULL
-to use the hard-coded code changes database. Degault NULL.}
 }
 \value{
 The input dataframe with gss codes changed and data aggregated
@@ -49,5 +47,6 @@ Aggregates data where rows with the same gss code are present
 lists the gss codes separated by ", " where the change is from one gss code to many.
 
 User must define the column containing the gss_code and the columns which 
-contain data. Data columns must be numeric or integer.
+contain data. Data columns must be numeric or integer and at least one data 
+column must be present.
 }

@@ -8,7 +8,10 @@
 #' given date/year.
 #' 
 #' User must define the name of the column containing GSS codes, give a name
-#' for the new column containing GSS names, and specify the date or year for the codes.
+#' for the new column to contain GSS names, and specify the date or year for the codes and names.
+#' 
+#' note that 2009 codes run up to 2012 but there was one name change in 2010
+#' and 2013 codes run up to 2019 but there was a name change in 2018.
 #' 
 #'
 #' @param df_in A data frame containing gss_codes and data.
@@ -29,6 +32,8 @@
 #' the GSS names. The first two columns will be the gss codes and gss names respectively
 #' 
 #' @import dplyr
+#' @importFrom lubridate is.Date
+#' @importFrom assertthat assert_that
 #' 
 #' @export
 
@@ -39,10 +44,12 @@ get_gss_names <- function(df_in,
                       gss_date = NA,
                       gss_year = NA) {
   
-  #TODO: add tests for inputs, including that the codes are fine for the year/date
-  #TODO: check that only one of gss_year or gss_date are defined
+  
+  .validate_get_gss_names(df_in, col_geog, col_gss_name, gss_date, gss_year)
+  
+  check_gss_codes(df_in, col_geog, gss_date, gss_year)
+  
   #TODO: just take the latest name if neither gss_date nor gss_year are defined?
-
   
   if (!!col_gss_name %in% names(df_in)) {
     df_in <- df_in %>% select(-!!col_gss_name)
@@ -67,4 +74,39 @@ get_gss_names <- function(df_in,
   df <- select(df, !!col_geog := gss_code, !!col_gss_name := gss_name, everything())
   
   return(df)
+}
+
+
+
+.validate_get_gss_names <- function(df_in, col_geog, col_gss_name, gss_date, gss_year) {
+  
+  assertthat::assert_that(col_geog %in% names(df_in),
+                          msg = paste0("in get_gss_names, specified col_geog `", col_geog,
+                                      "` not in input dataframe"))
+  
+  assertthat::assert_that(is.character(col_gss_name),
+                          msg = "in get_gss_names, col_gss_name must be of type character")
+  
+  if(col_gss_name %in% names(df_in)) warning(paste0("in get_gss_names df_in already contains column `", col_gss_name, "`. The data in this column will be overwritten."))
+  
+  assertthat::assert_that(is.na(gss_date) | is.na(gss_year),
+                          msg = "in get_gss_names only one of gss_date and gss_year can be specified")
+  
+  assertthat::assert_that(!(is.na(gss_date) & is.na(gss_year)),
+                          msg = "in get_gss_names one of gss_date or gss_year must be specified")
+  
+  assertthat::assert_that(is.na(gss_year) | is.numeric(gss_year) | is.integer(gss_year),
+                          msg = "in get_gss_names gss_year must be integer or numeric")
+  
+  assertthat::assert_that(is.na(gss_year) | (gss_year >= 2009 & gss_year <= database_year),
+                          msg = paste0("in get_gss_names gss_year must be a number between 2009 and ", database_year, ". If your required year is later than ", database_year ," then check if the gsscoder package code change database needs updating"))
+  
+  assertthat::assert_that(is.na(gss_date) | is.Date(gss_date),
+                          msg = "in get_gss_names gss_date must be a date object")
+  
+  assertthat::assert_that(is.na(gss_date) | (gss_date >= as.Date("2009-01-01") & gss_date <= database_date),
+                          msg = paste0("in get_gss_names gss_date must be between 2009-01-01 and ", database_date, ". If your required date is later than ", database_date ," then check if the gsscoder package code change database needs updating"))
+
+  
+  invisible()
 }

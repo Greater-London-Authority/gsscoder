@@ -3,6 +3,9 @@
 #' Returns the date range during which all of the gss codes in a dataframe were
 #' operational
 #'
+#' Note that 2018 codes will return as 2013 as they are the same as 2013 codes,
+#' only some of the gss names have changed and this doesn't check names. 
+#'
 #' @param df_in A data frame containing gss_codes.
 #' @param col_geog A string. The name of the column which contains gss codes (defaults to
 #'   \code{gss_code}).
@@ -11,20 +14,23 @@
 #' earliest and latest dates that the gss codeset was operational. 
 #' 
 #' @import dplyr
+#' @importFrom assertthat assert_that
+
 #' 
 #' @export
 
 get_gss_date <- function(df_in, 
                          col_geog = "gss_code") {
   
-  #TODO validation for df_in and col_geog
+  .validate_get_gss_date(df_in, col_geog)
+  
   
   df <- df_in %>%
     rename("gss_code" = !!col_geog)
   
   # get rid of any duplicates in the gss codes.  So far these have all been due to name changes where the code doesn't change
   # Condense to one entry which gives the start and end date of the code no matter what the name was.
-  code_dates <- all_lad_codes_dates %>%
+  code_dates <- all_lad_codes_dates %>% # all_lad_codes_dates is an internal package variable stored in R/sysdata.rda
     select(gss_code, entity_type, start_date, end_date, status) %>%
     group_by(gss_code) %>%
     mutate(orig_start_date = start_date,
@@ -39,9 +45,14 @@ get_gss_date <- function(df_in,
   code_dates_codes <- filter(code_dates, gss_code %in% df_codes)
   
   earliest_possible <- max(code_dates_codes$start_date, na.rm = TRUE)
-  latest_possible <- min(code_dates_codes$end_date, na.rm = TRUE) - 1
   
-  if(earliest_possible > latest_possible) stop("the codes in the dataframe were not all operational at the same time")
+  if (all(is.na(code_dates_codes$end_date))) {
+    latest_possible <- as.Date(NA)
+  } else {
+    latest_possible <- min(code_dates_codes$end_date, na.rm = TRUE) - 1
+  }
+  
+  if(!is.na(latest_possible) & earliest_possible > latest_possible) stop("the codes in the dataframe were not all operational at the same time")
   
   too_new <- code_dates_codes %>% filter(start_date > latest_possible)
   too_old <- code_dates_codes %>% filter(end_date < earliest_possible)
@@ -51,3 +62,17 @@ get_gss_date <- function(df_in,
   return(list(earliest = earliest_possible, latest = latest_possible))
   
 }
+
+.validate_get_gss_date <- function(df_in, col_geog) {
+  
+  assertthat::assert_that(col_geog %in% names(df_in),
+                          msg = paste("in get_gss_date, specified col_geog", col_geog,
+                                      "not in input dataframe"))
+  
+  assertthat::assert_that(all(df_in[[col_geog]] %in% all_lad_codes_dates$gss_code),
+                          msg = paste0("in get_gss_date the specified col_geog,", col_geog, ", contains unrecognised gss codes. Either the codes are incorrect or the gsscoder package code change database is not up to date"))
+  
+  invisible()
+}
+
+

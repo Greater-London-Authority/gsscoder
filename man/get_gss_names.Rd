@@ -38,12 +38,11 @@ the GSS names. The first two columns will be the gss codes and gss names respect
 Adds a column of GSS names to match a column of GSS codes.
 }
 \details{
-The names are given as the names that were operational for those GSS codes at 
-the given date/year.
+Uses the names that were operational for those GSS codes at the given date/year.
 
 Throws an error if there are any GSS codes which were not operational at the 
 given date/year.
 
-User must define the name of the column containing GSS codes, and give a name
-for the new column containing GSS names.
+User must define the name of the column containing GSS codes, give a name
+for the new column containing GSS names, and specify the date or year for the codes.
 }

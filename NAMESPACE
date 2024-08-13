@@ -3,6 +3,7 @@
 export(check_gss_codes)
 export(get_gss_date)
 export(get_gss_names)
+export(get_gss_year)
 export(recode_gss)
 import(data.table)
 import(dplyr)
