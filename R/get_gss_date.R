@@ -65,6 +65,14 @@ get_gss_date <- function(df_in,
 
 .validate_get_gss_date <- function(df_in, col_geog) {
   
+  # validate input variable data types
+  assertthat::assert_that(is.data.frame(df_in),
+                          msg = "in get_gss_date, df_in must be a dataframe")
+  
+  assertthat::assert_that(is.character(col_geog),
+                          msg = "in get_gss_date, col_geog must of type character")
+  
+  # other validations
   assertthat::assert_that(col_geog %in% names(df_in),
                           msg = paste("in get_gss_date, specified col_geog", col_geog,
                                       "not in input dataframe"))

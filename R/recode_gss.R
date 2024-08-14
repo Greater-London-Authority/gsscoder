@@ -49,12 +49,10 @@ recode_gss <- function(df_in,
   la_names <- all_lad_codes_dates %>%
     select(gss_name) %>% unique() %>% pull()
   
-  # the code change database year is the latest year that can be changed from/to
-  db_year <- database_date %>% 
-    format('%Y') %>% as.numeric()
+  
   
   #validate
-  .validate_recode_gss(df_in, col_geog, data_cols, recode_to_year, recode_from_year, fun, la_names, db_year)
+  .validate_recode_gss(df_in, col_geog, data_cols, recode_to_year, recode_from_year, fun, la_names)
   
   
   col_order <- names(df_in)
@@ -174,27 +172,50 @@ recode_gss <- function(df_in,
 }
 
 
-.validate_recode_gss <- function(df_in, col_geog, data_cols, recode_to_year, recode_from_year, fun, la_names, db_year) {
+.validate_recode_gss <- function(df_in, col_geog, data_cols, recode_to_year, recode_from_year, fun, la_names) {
   
+  # TODO lots of these assertions are replicated across the different functions.  Can they be pulled out somewhere else and called from here?
+  
+  # validate input variable data types
+  assertthat::assert_that(is.data.frame(df_in),
+                          msg = "in recode_gss, df_in must be a dataframe")
+  
+  assertthat::assert_that(is.character(col_geog),
+                          msg = "in recode_gss, col_geog must be of type character")
+  
+  assertthat::assert_that(is.character(data_cols),
+                          msg = "in recode_gss, data_cols must be of type character")
+  
+  assertthat::assert_that(is.numeric(recode_to_year) | is.integer(recode_to_year),
+                          msg = "in recode_gss recode_to_year must be integer or numeric")
+  
+  assertthat::assert_that(is.numeric(recode_from_year) | is.integer(recode_from_year),
+                          msg = "in recode_gss recode_to_year must be integer or numeric")
+  
+  # other validations
   assertthat::assert_that(fun %in% c("sum","mean"),
-                          msg = "in recode_gss_codes, fun must be sum or mean")
+                          msg = "in recode_gss, fun must be sum or mean")
   
   assertthat::assert_that(recode_from_year >= 2008,
                           msg = "in recode_gss, recode_from_year must be 2008 or later")
   
-  assertthat::assert_that(recode_from_year <= db_year,
+  
+  database_year <- database_date %>% format('%Y') %>% as.numeric()
+  assertthat::assert_that(recode_from_year <= database_year,
                           msg = paste0("in recode_gss, recode_from_year cannot be later than the year of the code change database which is ",
-                                       db_year, ". You may need to update the database."))
+                                       database_year, ". You may need to update the database."))
   
   assertthat::assert_that(recode_to_year >= 2008,
                           msg = "in recode_gss, recode_to_year must be 2008 or later")
   
-  assertthat::assert_that(recode_to_year <= db_year,
+  assertthat::assert_that(recode_to_year <= database_year,
                           msg = paste0("in recode_gss, recode_to_year cannot be later than the year of the code change database which is ",
-                                       db_year, ". You may need to update the database."))
+                                       database_year, ". You may need to update the database."))
   
   
   for(i in length(data_cols)){
+    
+    #TODO check that df_in is a dataframe
     assertthat::assert_that(data_cols[i] %in% names(df_in),
                             msg = paste0("in recode_gss_codes, specified data_cols '", data_cols[i],
                                         "' not in input dataframe"))
@@ -210,6 +231,8 @@ recode_gss <- function(df_in,
     mutate(across(everything(), as.character)) %>%
     select(where(~any(.x %in% la_names))) %>%
     names()
+  
+  # TODO make a more intelligent geographic area details check if there is a unique value of any column for each GSS code
   
   if (length(poss_name_cols > 0)) {warning(paste("in recode_gss_codes LA names have been detected in the input dataframe. If this is an LA name column please remove it before passing to recode_gss_codes:", paste(poss_name_cols, collapse = ", ")))}
   

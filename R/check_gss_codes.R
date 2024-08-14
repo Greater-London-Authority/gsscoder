@@ -37,26 +37,16 @@ check_gss_codes <- function(df_in,
                             full_coverage = FALSE,
                             include_wales = FALSE) {
   
-  # TODO move checks into a validate function
-  
-  if (is.na(gss_date) & is.na(gss_year)) {stop("either gss_date or gss_year must be specified")}
-  if (!is.na(gss_year) & !is.na(gss_date)) {stop("only one of gss_date and gss_year can be specified")}
-  
-  if (!is.na(gss_date) & !is.Date(gss_date)) {stop("gss_date must be given as a date object")}
-  if (!is.na(gss_year) & !grepl("^\\d{4}$", gss_year)) stop("gss_year must be given as a 4 digit number")
-  
-  if (!is.na(gss_year)) {gss_date <- as.Date(paste0(gss_year, "-12-31"))}
-  
-  if (gss_date > database_date) {stop("The gss code change database does not go up to the date requested. The package may need updating with the latest ONS code change data.")}
-  if (gss_date < as.Date("2009-01-01")) {stop("The gss date/year cannot be before 2009-01-01")}
+  .validate_check_gss_codes(df_in, col_geog, gss_date, gss_year, full_coverage, include_wales)
   
   code_dates <- all_lad_codes_dates %>%
     select(-status)
   
+  if (is.na(gss_date)) {gss_date <- as.Date(paste0(gss_year, "-12-31"))}
+  
   if (include_wales == FALSE) {
     code_dates <- filter(code_dates, !grepl("^W", gss_code))
   }
-  
   
   df_in <- df_in %>%
     rename("gss_code" = !!col_geog)
@@ -83,6 +73,52 @@ check_gss_codes <- function(df_in,
   
   invisible()
   
+}
+
+.validate_check_gss_codes <- function(df_in, col_geog, gss_date, gss_year, full_coverage, include_wales) {
+  
+  # validate input variable data types
+  assertthat::assert_that(is.data.frame(df_in),
+                          msg = "in check_gss_codes, df_in must be a dataframe")
+  
+  assertthat::assert_that(is.character(col_geog),
+                          msg = "in check_gss_codes, col_geog must of type character")
+  
+  assertthat::assert_that(is.na(gss_date) | is.Date(gss_date),
+                          msg = "in check_gss_codes gss_date must be a date object")
+  
+  assertthat::assert_that(is.na(gss_year) | is.numeric(gss_year) | is.integer(gss_year),
+                          msg = "in check_gss_codes gss_year must be integer or numeric")
+  
+  assertthat::assert_that(full_coverage %in% c(TRUE, FALSE),
+                          msg = "in check_gss_codes full_coverage must be set to TRUE or FALSE")
+  
+  assertthat::assert_that(include_wales %in% c(TRUE, FALSE),
+                          msg = "in check_gss_codes include_wales must be set to TRUE or FALSE")
+  
+  
+  # other validations
+  assertthat::assert_that(col_geog %in% names(df_in),
+                          msg = paste0("in check_gss_codes, specified col_geog `", col_geog,
+                                       "` not in input dataframe"))
+  
+  assertthat::assert_that(is.na(gss_date) | is.na(gss_year),
+                          msg = "in check_gss_codes only one of gss_date and gss_year can be specified")
+  
+  assertthat::assert_that(!(is.na(gss_date) & is.na(gss_year)),
+                          msg = "in check_gss_codes one of gss_date or gss_year must be specified")
+  
+ 
+  database_year <- database_date %>% format('%Y') %>% as.numeric()
+  assertthat::assert_that(is.na(gss_year) | (gss_year >= 2009 & gss_year <= database_year),
+                          msg = paste0("in check_gss_codes gss_year must be a number between 2009 and ", database_year, ". If your required year is later than ", database_year ," then check if the gsscoder package code change database needs updating"))
+  
+  assertthat::assert_that(is.na(gss_date) | (gss_date >= as.Date("2009-01-01") & gss_date <= database_date),
+                          msg = paste0("in check_gss_codes gss_date must be between 2009-01-01 and ", database_date, ". If your required date is later than ", database_date ," then check if the gsscoder package code change database needs updating"))
+  
+ 
+  
+  invisible()
 }
 
 

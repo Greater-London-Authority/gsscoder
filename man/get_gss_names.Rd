@@ -44,5 +44,8 @@ Throws an error if there are any GSS codes which were not operational at the
 given date/year.
 
 User must define the name of the column containing GSS codes, give a name
-for the new column containing GSS names, and specify the date or year for the codes.
+for the new column to contain GSS names, and specify the date or year for the codes and names.
+
+note that 2009 codes run up to 2012 but there was one name change in 2010
+and 2013 codes run up to 2019 but there was a name change in 2018.
 }

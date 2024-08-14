@@ -1,5 +1,8 @@
 # gsscoder
 
+**WARNING!! This package is in very early stage development. Future updates
+may break code written with the package in its current state.** 
+
 This package provides functions for wrangling ONS LA GSS codes, including
 switching from one vintage to another. It currently only works on LA level
 codes for England and Wales. 
