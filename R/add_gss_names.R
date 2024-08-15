@@ -38,14 +38,14 @@
 #' @export
 
 
-get_gss_names <- function(df_in, 
+add_gss_names <- function(df_in, 
                       col_geog = "gss_code", 
                       col_gss_name = "gss_name", 
                       gss_date = NA,
                       gss_year = NA) {
   
   
-  .validate_get_gss_names(df_in, col_geog, col_gss_name, gss_date, gss_year)
+  .validate_add_gss_names(df_in, col_geog, col_gss_name, gss_date, gss_year)
   
   check_gss_codes(df_in, col_geog, gss_date, gss_year)
   
@@ -78,43 +78,43 @@ get_gss_names <- function(df_in,
 
 
 
-.validate_get_gss_names <- function(df_in, col_geog, col_gss_name, gss_date, gss_year) {
+.validate_add_gss_names <- function(df_in, col_geog, col_gss_name, gss_date, gss_year) {
   
   # validate input variable data types
   assertthat::assert_that(is.data.frame(df_in),
-                          msg = "in get_gss_names, df_in must be a dataframe")
+                          msg = "in add_gss_names, df_in must be a dataframe")
   
   assertthat::assert_that(is.character(col_geog),
-                          msg = "in get_gss_names, col_geog must be of type character")
+                          msg = "in add_gss_names, col_geog must be of type character")
   
   assertthat::assert_that(is.character(col_gss_name),
-                          msg = "in get_gss_names, col_gss_name must be of type character")
+                          msg = "in add_gss_names, col_gss_name must be of type character")
   
   assertthat::assert_that(is.na(gss_date) | is.Date(gss_date),
-                          msg = "in get_gss_names gss_date must be a date object")
+                          msg = "in add_gss_names gss_date must be a date object")
   
   assertthat::assert_that(is.na(gss_year) | is.numeric(gss_year) | is.integer(gss_year),
-                          msg = "in get_gss_names gss_year must be integer or numeric")
+                          msg = "in add_gss_names gss_year must be integer or numeric")
   
   # other validations
   assertthat::assert_that(col_geog %in% names(df_in),
-                          msg = paste0("in get_gss_names, specified col_geog `", col_geog,
+                          msg = paste0("in add_gss_names, specified col_geog `", col_geog,
                                       "` not in input dataframe"))
   
-  if(col_gss_name %in% names(df_in)) warning(paste0("in get_gss_names df_in already contains column `", col_gss_name, "`. The data in this column will be overwritten."))
+  if(col_gss_name %in% names(df_in)) warning(paste0("in add_gss_names df_in already contains column `", col_gss_name, "`. The data in this column will be overwritten."))
   
   assertthat::assert_that(is.na(gss_date) | is.na(gss_year),
-                          msg = "in get_gss_names only one of gss_date and gss_year can be specified")
+                          msg = "in add_gss_names only one of gss_date and gss_year can be specified")
   
   assertthat::assert_that(!(is.na(gss_date) & is.na(gss_year)),
-                          msg = "in get_gss_names one of gss_date or gss_year must be specified")
+                          msg = "in add_gss_names one of gss_date or gss_year must be specified")
   
   database_year <- database_date %>% format('%Y') %>% as.numeric()
   assertthat::assert_that(is.na(gss_year) | (gss_year >= 2009 & gss_year <= database_year),
-                          msg = paste0("in get_gss_names gss_year must be a number between 2009 and ", database_year, ". If your required year is later than ", database_year ," then check if the gsscoder package code change database needs updating"))
+                          msg = paste0("in add_gss_names gss_year must be a number between 2009 and ", database_year, ". If your required year is later than ", database_year ," then check if the gsscoder package code change database needs updating"))
   
   assertthat::assert_that(is.na(gss_date) | (gss_date >= as.Date("2009-01-01") & gss_date <= database_date),
-                          msg = paste0("in get_gss_names gss_date must be between 2009-01-01 and ", database_date, ". If your required date is later than ", database_date ," then check if the gsscoder package code change database needs updating"))
+                          msg = paste0("in add_gss_names gss_date must be between 2009-01-01 and ", database_date, ". If your required date is later than ", database_date ," then check if the gsscoder package code change database needs updating"))
 
   
   invisible()

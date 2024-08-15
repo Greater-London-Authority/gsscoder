@@ -1,6 +1,3 @@
-library(dplyr)
-library(tidyr)
-
 codes <- test_codes # internal package variable stored in R/sysdata.rda and created in data-raw/testthat_data.R
 
 
