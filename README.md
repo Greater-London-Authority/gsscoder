@@ -26,7 +26,7 @@ set.seed(8)
 mydata$value <- sample(1:100, nrow(mydata), replace = TRUE)
 
 # use gsscoder functions
-recode_gss(mydata, col_geog = "gss_code", data_cols = "value, recode_from_year = 2019, recode_to_year = 2023)
+recode_gss(mydata, col_code = "gss_code", col_data = "value", recode_from_year = 2019, recode_to_year = 2023)
 ```
 
 ## Updating package

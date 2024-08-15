@@ -4,12 +4,12 @@
 \alias{get_gss_year}
 \title{Get the year that a set of GSS codes were operational}
 \usage{
-get_gss_year(df_in, col_geog = "gss_code")
+get_gss_year(df_in, col_code = "gss_code")
 }
 \arguments{
 \item{df_in}{A data frame containing gss_codes.}
 
-\item{col_geog}{A string. The name of the column which contains gss codes (defaults to
+\item{col_code}{A string. The name of the column which contains gss codes (defaults to
 \code{gss_code}).}
 }
 \value{

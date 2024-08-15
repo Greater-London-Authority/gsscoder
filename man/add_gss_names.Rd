@@ -6,8 +6,8 @@
 \usage{
 add_gss_names(
   df_in,
-  col_geog = "gss_code",
-  col_gss_name = "gss_name",
+  col_code = "gss_code",
+  col_name = "gss_name",
   gss_date = NA,
   gss_year = NA
 )
@@ -15,10 +15,10 @@ add_gss_names(
 \arguments{
 \item{df_in}{A data frame containing gss_codes and data.}
 
-\item{col_geog}{A string. The name of the column which contains gss codes (defaults to
+\item{col_code}{A string. The name of the column which contains gss codes (defaults to
 \code{gss_code}).}
 
-\item{col_gss_name}{A string. The name to give the new column containing gss names. 
+\item{col_name}{A string. The name to give the new column containing gss names. 
 Defaults to \code{gss_name}. If the column already exists in \code{df_in} it will be
 overwritten.}
 

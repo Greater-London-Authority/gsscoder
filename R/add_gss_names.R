@@ -15,9 +15,9 @@
 #' 
 #'
 #' @param df_in A data frame containing gss_codes and data.
-#' @param col_geog A string. The name of the column which contains gss codes (defaults to
+#' @param col_code A string. The name of the column which contains gss codes (defaults to
 #'   \code{gss_code}).
-#' @param col_gss_name A string. The name to give the new column containing gss names. 
+#' @param col_name A string. The name to give the new column containing gss names. 
 #' Defaults to \code{gss_name}. If the column already exists in \code{df_in} it will be
 #' overwritten.
 #' @param gss_date A date object specifying the point in time that the gss codes 
@@ -39,24 +39,24 @@
 
 
 add_gss_names <- function(df_in, 
-                      col_geog = "gss_code", 
-                      col_gss_name = "gss_name", 
+                      col_code = "gss_code", 
+                      col_name = "gss_name", 
                       gss_date = NA,
                       gss_year = NA) {
   
   
-  .validate_add_gss_names(df_in, col_geog, col_gss_name, gss_date, gss_year)
+  .validate_add_gss_names(df_in, col_code, col_name, gss_date, gss_year)
   
-  check_gss_codes(df_in, col_geog, gss_date, gss_year)
+  check_gss_codes(df_in, col_code, gss_date, gss_year)
   
   #TODO: just take the latest name if neither gss_date nor gss_year are defined?
   
-  if (!!col_gss_name %in% names(df_in)) {
-    df_in <- df_in %>% select(-!!col_gss_name)
+  if (!!col_name %in% names(df_in)) {
+    df_in <- df_in %>% select(-!!col_name)
   }
   
   df <- df_in %>%
-    rename("gss_code" = !!col_geog)
+    rename("gss_code" = !!col_code)
   
   
   if (!is.na(gss_year)) {
@@ -71,24 +71,24 @@ add_gss_names <- function(df_in,
   
   df <- df %>% left_join(code_names, by = c("gss_code"))
     
-  df <- select(df, !!col_geog := gss_code, !!col_gss_name := gss_name, everything())
+  df <- select(df, !!col_code := gss_code, !!col_name := gss_name, everything())
   
   return(df)
 }
 
 
 
-.validate_add_gss_names <- function(df_in, col_geog, col_gss_name, gss_date, gss_year) {
+.validate_add_gss_names <- function(df_in, col_code, col_name, gss_date, gss_year) {
   
   # validate input variable data types
   assertthat::assert_that(is.data.frame(df_in),
                           msg = "in add_gss_names, df_in must be a dataframe")
   
-  assertthat::assert_that(is.character(col_geog),
-                          msg = "in add_gss_names, col_geog must be of type character")
+  assertthat::assert_that(is.character(col_code),
+                          msg = "in add_gss_names, col_code must be of type character")
   
-  assertthat::assert_that(is.character(col_gss_name),
-                          msg = "in add_gss_names, col_gss_name must be of type character")
+  assertthat::assert_that(is.character(col_name),
+                          msg = "in add_gss_names, col_name must be of type character")
   
   assertthat::assert_that(is.na(gss_date) | is.Date(gss_date),
                           msg = "in add_gss_names gss_date must be a date object")
@@ -97,11 +97,11 @@ add_gss_names <- function(df_in,
                           msg = "in add_gss_names gss_year must be integer or numeric")
   
   # other validations
-  assertthat::assert_that(col_geog %in% names(df_in),
-                          msg = paste0("in add_gss_names, specified col_geog `", col_geog,
+  assertthat::assert_that(col_code %in% names(df_in),
+                          msg = paste0("in add_gss_names, specified col_code `", col_code,
                                       "` not in input dataframe"))
   
-  if(col_gss_name %in% names(df_in)) warning(paste0("in add_gss_names df_in already contains column `", col_gss_name, "`. The data in this column will be overwritten."))
+  if(col_name %in% names(df_in)) warning(paste0("in add_gss_names df_in already contains column `", col_name, "`. The data in this column will be overwritten."))
   
   assertthat::assert_that(is.na(gss_date) | is.na(gss_year),
                           msg = "in add_gss_names only one of gss_date and gss_year can be specified")

@@ -7,17 +7,17 @@ were operational at a given date.}
 \usage{
 check_gss_codes(
   df_in,
-  col_geog = "gss_code",
+  col_code = "gss_code",
   gss_date = NA,
   gss_year = NA,
-  full_coverage = FALSE,
+  expect_complete = FALSE,
   include_wales = FALSE
 )
 }
 \arguments{
 \item{df_in}{A data frame containing gss_codes and data.}
 
-\item{col_geog}{A string. The name of the column which contains gss codes 
+\item{col_code}{A string. The name of the column which contains gss codes 
 (defaults to \code{gss_code}).}
 
 \item{gss_date}{A date object specifying the point in time that the gss codes 
@@ -28,10 +28,10 @@ or gss_year can be defined. Defaults to \code{NA})}
 Equivalent to setting gss_date to 31st December of that year. Only one of gss_date 
 or gss_year can be defined. Defaults to \code{NA})}
 
-\item{full_coverage}{Logical. If set to TRUE a warning will be given if there are 
+\item{expect_complete}{Logical. If set to TRUE a warning will be given if there are 
 codes which are not in df_in but were operational on the date/year given. Defaults to \code{FALSE})}
 
-\item{include_wales}{Logical. If set to TRUE when full_coverage is TRUE, warnings
+\item{include_wales}{Logical. If set to TRUE when expect_complete is TRUE, warnings
 will be given for missing Welsh codes as well as English ones. Defaults to \code{FALSE})}
 }
 \value{
@@ -43,5 +43,5 @@ and can also check for completeness covering England and optionally Wales.
 }
 \details{
 Throws an error if there are codes present which weren't live on the give date,
-and warns for any missing codes if full_coverage is set to TRUE.
+and warns for any missing codes if expect_complete is set to TRUE.
 }

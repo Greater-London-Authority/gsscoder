@@ -5,11 +5,11 @@
 #' and can also check for completeness covering England and optionally Wales.
 #'
 #' Throws an error if there are codes present which weren't live on the give date,
-#' and warns for any missing codes if full_coverage is set to TRUE. 
+#' and warns for any missing codes if expect_complete is set to TRUE. 
 #' 
 #'
 #' @param df_in A data frame containing gss_codes and data.
-#' @param col_geog A string. The name of the column which contains gss codes 
+#' @param col_code A string. The name of the column which contains gss codes 
 #' (defaults to \code{gss_code}).
 #' @param gss_date A date object specifying the point in time that the gss codes 
 #' in the dataframe are being checked against. Only one of gss_date 
@@ -17,9 +17,9 @@
 #' @param gss_year Numeric or Integer. The year against which to check the gss codes. 
 #' Equivalent to setting gss_date to 31st December of that year. Only one of gss_date 
 #' or gss_year can be defined. Defaults to \code{NA}) 
-#' @param full_coverage Logical. If set to TRUE a warning will be given if there are 
+#' @param expect_complete Logical. If set to TRUE a warning will be given if there are 
 #' codes which are not in df_in but were operational on the date/year given. Defaults to \code{FALSE})
-#' @param include_wales Logical. If set to TRUE when full_coverage is TRUE, warnings
+#' @param include_wales Logical. If set to TRUE when expect_complete is TRUE, warnings
 #' will be given for missing Welsh codes as well as English ones. Defaults to \code{FALSE})
 #' 
 #' @return Does't return anything
@@ -31,13 +31,13 @@
 
 
 check_gss_codes <- function(df_in, 
-                            col_geog = "gss_code",
+                            col_code = "gss_code",
                             gss_date = NA, 
                             gss_year = NA, 
-                            full_coverage = FALSE,
+                            expect_complete = FALSE,
                             include_wales = FALSE) {
   
-  .validate_check_gss_codes(df_in, col_geog, gss_date, gss_year, full_coverage, include_wales)
+  .validate_check_gss_codes(df_in, col_code, gss_date, gss_year, expect_complete, include_wales)
   
   code_dates <- all_lad_codes_dates %>%
     select(-status)
@@ -49,7 +49,7 @@ check_gss_codes <- function(df_in,
   }
   
   df_in <- df_in %>%
-    rename("gss_code" = !!col_geog)
+    rename("gss_code" = !!col_code)
   
   expected_codes <- filter(code_dates, start_date <= gss_date & (end_date >= gss_date | is.na(end_date)))
   
@@ -58,9 +58,9 @@ check_gss_codes <- function(df_in,
   
   missing_codes <- filter(expected_codes, !gss_code %in% df_in$gss_code)
   
-  if (nrow(missing_codes !=0 & full_coverage == TRUE)) { 
+  if (nrow(missing_codes !=0 & expect_complete == TRUE)) { 
     # TODO? Change this to an error instead of warning.  Refactor to include both missing and non-live codes in one error message
-    warning(paste0("The gss codes above are missing from the data. They were live on the date given (",gss_date,"). Either fix the data or set 'include_wales' and/or 'full_coverage' params to FALSE", 
+    warning(paste0("The gss codes above are missing from the data. They were live on the date given (",gss_date,"). Either fix the data or set 'include_wales' and/or 'expect_complete' params to FALSE", 
                    message(paste(capture.output(missing_codes), collapse = "\n"))))
     
   }
@@ -75,14 +75,14 @@ check_gss_codes <- function(df_in,
   
 }
 
-.validate_check_gss_codes <- function(df_in, col_geog, gss_date, gss_year, full_coverage, include_wales) {
+.validate_check_gss_codes <- function(df_in, col_code, gss_date, gss_year, expect_complete, include_wales) {
   
   # validate input variable data types
   assertthat::assert_that(is.data.frame(df_in),
                           msg = "in check_gss_codes, df_in must be a dataframe")
   
-  assertthat::assert_that(is.character(col_geog),
-                          msg = "in check_gss_codes, col_geog must of type character")
+  assertthat::assert_that(is.character(col_code),
+                          msg = "in check_gss_codes, col_code must of type character")
   
   assertthat::assert_that(is.na(gss_date) | is.Date(gss_date),
                           msg = "in check_gss_codes gss_date must be a date object")
@@ -90,16 +90,16 @@ check_gss_codes <- function(df_in,
   assertthat::assert_that(is.na(gss_year) | is.numeric(gss_year) | is.integer(gss_year),
                           msg = "in check_gss_codes gss_year must be integer or numeric")
   
-  assertthat::assert_that(full_coverage %in% c(TRUE, FALSE),
-                          msg = "in check_gss_codes full_coverage must be set to TRUE or FALSE")
+  assertthat::assert_that(expect_complete %in% c(TRUE, FALSE),
+                          msg = "in check_gss_codes expect_complete must be set to TRUE or FALSE")
   
   assertthat::assert_that(include_wales %in% c(TRUE, FALSE),
                           msg = "in check_gss_codes include_wales must be set to TRUE or FALSE")
   
   
   # other validations
-  assertthat::assert_that(col_geog %in% names(df_in),
-                          msg = paste0("in check_gss_codes, specified col_geog `", col_geog,
+  assertthat::assert_that(col_code %in% names(df_in),
+                          msg = paste0("in check_gss_codes, specified col_code `", col_code,
                                        "` not in input dataframe"))
   
   assertthat::assert_that(is.na(gss_date) | is.na(gss_year),

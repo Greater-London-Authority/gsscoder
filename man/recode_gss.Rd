@@ -6,8 +6,8 @@
 \usage{
 recode_gss(
   df_in,
-  col_geog = "gss_code",
-  data_cols = "value",
+  col_code = "gss_code",
+  col_data = "value",
   fun = "sum",
   recode_from_year,
   recode_to_year,
@@ -17,12 +17,8 @@ recode_gss(
 \arguments{
 \item{df_in}{A data frame containing gss_codes and data.}
 
-\item{col_geog}{A string. The column which contains gss codes (defaults to
+\item{col_code}{A string. The column which contains gss codes (defaults to
 \code{gss_code}).}
-
-\item{data_cols}{A string or character vector. The column(s) that contain the
-data to be aggregated. Defaults to last column of input dataframe. At least 
-one data column must be specified.}
 
 \item{fun}{Character Function to be applied in aggregating data. Either 'sum'
 or 'mean'. Default \code{'sum'}.}
@@ -34,6 +30,10 @@ or 'mean'. Default \code{'sum'}.}
 \item{aggregate_data}{Logical. If set to true multiple instances of the same
 gss code will be aggregated using the function specified in \code{fun} parameter.
 Default to \code{TRUE}.}
+
+\item{col_dataA}{string or character vector. The column(s) that contain the
+data to be aggregated. Defaults to last column of input dataframe. At least 
+one data column must be specified.}
 }
 \value{
 The input dataframe with gss codes changed and data aggregated

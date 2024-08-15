@@ -11,9 +11,9 @@
 #' column must be present.
 #'
 #' @param df_in A data frame containing gss_codes and data.
-#' @param col_geog A string. The column which contains gss codes (defaults to
+#' @param col_code A string. The column which contains gss codes (defaults to
 #'   \code{gss_code}).
-#' @param data_cols A string or character vector. The column(s) that contain the
+#' @param col_dataA string or character vector. The column(s) that contain the
 #'   data to be aggregated. Defaults to last column of input dataframe. At least 
 #'   one data column must be specified. 
 #' @param fun Character Function to be applied in aggregating data. Either 'sum'
@@ -35,8 +35,8 @@
 #' @export
 
 recode_gss <- function(df_in,
-                       col_geog="gss_code",
-                       data_cols = "value",
+                       col_code="gss_code",
+                       col_data= "value",
                        fun = "sum",
                        recode_from_year,
                        recode_to_year,
@@ -52,7 +52,7 @@ recode_gss <- function(df_in,
   
   
   #validate
-  .validate_recode_gss(df_in, col_geog, data_cols, recode_to_year, recode_from_year, fun, la_names)
+  .validate_recode_gss(df_in, col_code, col_data, recode_to_year, recode_from_year, fun, la_names)
   
   
   col_order <- names(df_in)
@@ -60,7 +60,7 @@ recode_gss <- function(df_in,
   #prepare input dataframe
   df <- df_in %>%
     as.data.frame() %>%
-    rename("gss_code" = !!col_geog)
+    rename("gss_code" = !!col_code)
   
   if (recode_to_year < recode_from_year) {
     # reverse the code changes dataframe if the code year is being rolled backwards rather than forwards
@@ -134,7 +134,7 @@ recode_gss <- function(df_in,
   #how does it choose which is the largest area? Actaully a merge just goes to 1 code in the changed to so thats fine. 
   #not sure about how it would work if 1 area has had merges and splits that follow on from each other?
   
-  col_aggregation <- setdiff(names(df),data_cols)
+  col_aggregation <- setdiff(names(df),col_data)
   
   
   if(aggregate_data){
@@ -158,7 +158,7 @@ recode_gss <- function(df_in,
   }
   
   df <- as.data.frame(df) %>%
-    rename(!!col_geog := "gss_code") %>%
+    rename(!!col_code := "gss_code") %>%
     select(all_of(col_order)) # output df should have same column order as input df
   
   # TODO: how does this function change the order of the rows in the df? Is that the
@@ -172,7 +172,7 @@ recode_gss <- function(df_in,
 }
 
 
-.validate_recode_gss <- function(df_in, col_geog, data_cols, recode_to_year, recode_from_year, fun, la_names) {
+.validate_recode_gss <- function(df_in, col_code, col_data, recode_to_year, recode_from_year, fun, la_names) {
   
   # TODO lots of these assertions are replicated across the different functions.  Can they be pulled out somewhere else and called from here?
   
@@ -180,11 +180,11 @@ recode_gss <- function(df_in,
   assertthat::assert_that(is.data.frame(df_in),
                           msg = "in recode_gss, df_in must be a dataframe")
   
-  assertthat::assert_that(is.character(col_geog),
-                          msg = "in recode_gss, col_geog must be of type character")
+  assertthat::assert_that(is.character(col_code),
+                          msg = "in recode_gss, col_code must be of type character")
   
-  assertthat::assert_that(is.character(data_cols),
-                          msg = "in recode_gss, data_cols must be of type character")
+  assertthat::assert_that(is.character(col_data),
+                          msg = "in recode_gss, col_datamust be of type character")
   
   assertthat::assert_that(is.numeric(recode_to_year) | is.integer(recode_to_year),
                           msg = "in recode_gss recode_to_year must be integer or numeric")
@@ -213,16 +213,16 @@ recode_gss <- function(df_in,
                                        database_year, ". You may need to update the database."))
   
   
-  for(i in length(data_cols)){
+  for(i in length(col_data)){
     
     #TODO check that df_in is a dataframe
-    assertthat::assert_that(data_cols[i] %in% names(df_in),
-                            msg = paste0("in recode_gss_codes, specified data_cols '", data_cols[i],
+    assertthat::assert_that(col_data[i] %in% names(df_in),
+                            msg = paste0("in recode_gss_codes, specified col_data'", col_data[i],
                                         "' not in input dataframe"))
   }
   
-  assertthat::assert_that(col_geog %in% names(df_in),
-                          msg = paste("in recode_gss_codes, specified col_geog", col_geog,
+  assertthat::assert_that(col_code %in% names(df_in),
+                          msg = paste("in recode_gss_codes, specified col_code", col_code,
                                       "not in input dataframe"))
   
   

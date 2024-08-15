@@ -84,14 +84,14 @@ expect_2023 <- expect_2021 %>% mutate(
 
 
 
-output_2009 <- recode_gss(expect_2008,  data_cols = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2009) %>% arrange(gss_code)
-output_2012 <- recode_gss(expect_2008,  data_cols = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2012) %>% arrange(gss_code)
-output_2013 <- recode_gss(expect_2008,  data_cols = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2013) %>% arrange(gss_code)
-output_2018 <- recode_gss(expect_2008,  data_cols = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2018) %>% arrange(gss_code)
-output_2019 <- recode_gss(expect_2008,  data_cols = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2019) %>% arrange(gss_code)
-output_2020 <- recode_gss(expect_2008,  data_cols = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2020) %>% arrange(gss_code)
-output_2021 <- recode_gss(expect_2008,  data_cols = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2021) %>% arrange(gss_code)
-output_2023 <- recode_gss(expect_2008,  data_cols = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2023) %>% arrange(gss_code)
+output_2009 <- recode_gss(expect_2008,  col_data = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2009) %>% arrange(gss_code)
+output_2012 <- recode_gss(expect_2008,  col_data = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2012) %>% arrange(gss_code)
+output_2013 <- recode_gss(expect_2008,  col_data = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2013) %>% arrange(gss_code)
+output_2018 <- recode_gss(expect_2008,  col_data = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2018) %>% arrange(gss_code)
+output_2019 <- recode_gss(expect_2008,  col_data = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2019) %>% arrange(gss_code)
+output_2020 <- recode_gss(expect_2008,  col_data = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2020) %>% arrange(gss_code)
+output_2021 <- recode_gss(expect_2008,  col_data = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2021) %>% arrange(gss_code)
+output_2023 <- recode_gss(expect_2008,  col_data = c("value", "value2"), recode_from_year = 2008, recode_to_year = 2023) %>% arrange(gss_code)
 
 
 test_that("recode_gss_codes produces the expected outputs when rolling forwards", {
@@ -184,14 +184,14 @@ expectbw_2008 <- expectbw_2009 %>% mutate(
                        TRUE ~ gss_code)) %>%
   arrange(gss_code, sex, age)
 
-outputbw_2008 <- recode_gss(expectbw_2023,  data_cols = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2008) %>% arrange(gss_code, sex, age)
-outputbw_2009 <- recode_gss(expectbw_2023,  data_cols = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2009) %>% arrange(gss_code, sex, age)
-outputbw_2012 <- recode_gss(expectbw_2023,  data_cols = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2012) %>% arrange(gss_code, sex, age)
-outputbw_2013 <- recode_gss(expectbw_2023,  data_cols = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2013) %>% arrange(gss_code, sex, age)
-outputbw_2018 <- recode_gss(expectbw_2023,  data_cols = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2018) %>% arrange(gss_code, sex, age)
-outputbw_2019 <- recode_gss(expectbw_2023,  data_cols = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2019) %>% arrange(gss_code, sex, age)
-outputbw_2020 <- recode_gss(expectbw_2023,  data_cols = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2020) %>% arrange(gss_code, sex, age)
-outputbw_2021 <- recode_gss(expectbw_2023,  data_cols = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2021) %>% arrange(gss_code, sex, age)
+outputbw_2008 <- recode_gss(expectbw_2023,  col_data = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2008) %>% arrange(gss_code, sex, age)
+outputbw_2009 <- recode_gss(expectbw_2023,  col_data = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2009) %>% arrange(gss_code, sex, age)
+outputbw_2012 <- recode_gss(expectbw_2023,  col_data = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2012) %>% arrange(gss_code, sex, age)
+outputbw_2013 <- recode_gss(expectbw_2023,  col_data = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2013) %>% arrange(gss_code, sex, age)
+outputbw_2018 <- recode_gss(expectbw_2023,  col_data = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2018) %>% arrange(gss_code, sex, age)
+outputbw_2019 <- recode_gss(expectbw_2023,  col_data = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2019) %>% arrange(gss_code, sex, age)
+outputbw_2020 <- recode_gss(expectbw_2023,  col_data = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2020) %>% arrange(gss_code, sex, age)
+outputbw_2021 <- recode_gss(expectbw_2023,  col_data = c("value", "value2"), recode_from_year = 2023, recode_to_year = 2021) %>% arrange(gss_code, sex, age)
 
 test_that("recode_gss_codes produces the expected outputs when rolling backwards", {
   expect_equal(outputbw_2008, expectbw_2008)
