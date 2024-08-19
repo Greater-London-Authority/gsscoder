@@ -10,7 +10,6 @@ test_that("check_gss_codes passes when expected", {
   expect_no_error(check_gss_codes(test_codes$y2023, gss_year = 2023, expect_complete = TRUE, include_wales = TRUE))
 })
 
-# TODO fix this when check_gss_codes is changed to always give errors and never warnings
-# test_that("check_gss_codes fails when expected", {
-#   expect_error(check_gss_codes(test_codes$y2009, gss_year = 2018, expect_complete = TRUE, include_wales = TRUE))
-# })
+test_that("check_gss_codes fails when expected", {
+  expect_error(check_gss_codes(test_codes$y2009, gss_year = 2018, expect_complete = TRUE, include_wales = TRUE))
+})

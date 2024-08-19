@@ -39,36 +39,49 @@ check_gss_codes <- function(df_in,
   
   .validate_check_gss_codes(df_in, col_code, gss_date, gss_year, expect_complete, include_wales)
   
-  code_dates <- all_lad_codes_dates %>%
+  code_dates <- all_lad_codes_dates %>% # all_lad_codes_dates is an internal package data variable stored in R/sysdata.rda
     select(-status)
   
   if (is.na(gss_date)) {gss_date <- as.Date(paste0(gss_year, "-12-31"))}
   
-  if (include_wales == FALSE) {
-    code_dates <- filter(code_dates, !grepl("^W", gss_code))
-  }
-  
   df_in <- df_in %>%
     rename("gss_code" = !!col_code)
   
+  # find any unexpected/missing codes
   expected_codes <- filter(code_dates, start_date <= gss_date & (end_date >= gss_date | is.na(end_date)))
   
   unexpected_codes <- filter(df_in, !gss_code %in% expected_codes$gss_code) %>% pull(gss_code) %>% unique()
   unexpected_code_details <- filter(code_dates, gss_code %in% unexpected_codes)
   
+  if (include_wales == FALSE) {
+    code_dates <- filter(code_dates, !grepl("^W", gss_code))
+  }
+  
   missing_codes <- filter(expected_codes, !gss_code %in% df_in$gss_code)
   
-  if (nrow(missing_codes !=0 & expect_complete == TRUE)) { 
-    # TODO? Change this to an error instead of warning.  Refactor to include both missing and non-live codes in one error message
-    warning(paste0("The gss codes above are missing from the data. They were live on the date given (",gss_date,"). Either fix the data or set 'include_wales' and/or 'expect_complete' params to FALSE", 
-                   message(paste(capture.output(missing_codes), collapse = "\n"))))
+  # Build and print any error messages
+  unexpected_codes_msg <- ""
+  missing_codes_msg <- ""
+  
+  if (length(unexpected_codes != 0)) {
+    
+    print("UNEXPECTED CODES:")
+    print(unexpected_codes)
+    print(unexpected_code_details)
+    unexpected_codes_msg <- paste0("There are gss codes present in the data (see UNEXPECTED CODES above) that were not live on the date given (",gss_date,").")
     
   }
   
-  if (nrow(unexpected_code_details != 0)) {
-    
-    stop(paste0("The gss codes above are present in the data but were not live on the date given (",gss_date,").", message(paste(capture.output(unexpected_code_details), collapse = "\n"))))
-    
+  if (nrow(missing_codes !=0 & expect_complete == TRUE)) { 
+
+    print("MISSING CODES:")
+    print(missing_codes)
+    missing_codes_msg <- paste0("There are gss codes missing from the data (see MISSING CODES above) which were live on the date given (",gss_date,"). Either fix the data or set 'include_wales' and/or 'expect_complete' params to FALSE.")
+   
+  }
+  
+  if (nrow(missing_codes !=0 & expect_complete == TRUE) | nrow(unexpected_code_details != 0)) {
+    stop(paste(unexpected_codes_msg, missing_codes_msg))
   }
   
   invisible()
