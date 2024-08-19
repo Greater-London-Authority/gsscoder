@@ -42,11 +42,11 @@ recode_gss <- function(df_in,
                        recode_to_year,
                        aggregate_data = TRUE) {
   
-  # read in code change database
-  code_changes <- lad_code_changes
+  # assign code changes to new variable as it will be altered below. 
+  code_changes <- lad_code_changes # lad_code_changes is an internal package data variable stored in R/sysdata.rda
   
   # names are for checking that none of the columns contain LA names
-  la_names <- all_lad_codes_dates %>%
+  la_names <- all_lad_codes_dates %>% # all_lad_codes_dates is an internal package data variable stored in R/sysdata.rda
     select(gss_name) %>% unique() %>% pull()
   
   
@@ -200,7 +200,7 @@ recode_gss <- function(df_in,
                           msg = "in recode_gss, recode_from_year must be 2008 or later")
   
   
-  database_year <- database_date %>% format('%Y') %>% as.numeric()
+  database_year <- database_date %>% format('%Y') %>% as.numeric() # database_date is an internal package data variable stored in R/sysdata.rda
   assertthat::assert_that(recode_from_year <= database_year,
                           msg = paste0("in recode_gss, recode_from_year cannot be later than the year of the code change database which is ",
                                        database_year, ". You may need to update the database."))

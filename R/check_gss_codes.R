@@ -122,7 +122,7 @@ check_gss_codes <- function(df_in,
                           msg = "in check_gss_codes one of gss_date or gss_year must be specified")
   
  
-  database_year <- database_date %>% format('%Y') %>% as.numeric()
+  database_year <- database_date %>% format('%Y') %>% as.numeric() # database_date is an internal package data variable stored in R/sysdata.rda
   assertthat::assert_that(is.na(gss_year) | (gss_year >= 2009 & gss_year <= database_year),
                           msg = paste0("in check_gss_codes gss_year must be a number between 2009 and ", database_year, ". If your required year is later than ", database_year ," then check if the gsscoder package code change database needs updating"))
   
