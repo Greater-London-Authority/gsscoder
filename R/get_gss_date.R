@@ -49,7 +49,7 @@ get_gss_date <- function(df_in,
   if (all(is.na(code_dates_codes$end_date))) {
     latest_possible <- as.Date(NA)
   } else {
-    latest_possible <- min(code_dates_codes$end_date, na.rm = TRUE) - 1
+    latest_possible <- min(code_dates_codes$end_date, na.rm = TRUE)
   }
   
   if(!is.na(latest_possible) & earliest_possible > latest_possible) stop("the codes in the dataframe were not all operational at the same time")
@@ -84,3 +84,4 @@ get_gss_date <- function(df_in,
 }
 
 
+ 

@@ -70,8 +70,6 @@ lad_code_changes <- filter(code_changes, ENTITYCD %in% geogs_of_interest) %>% # 
   filter(old_entity %in% geogs_of_interest) %>% # many of the code changes in the database are from 2009 when the new 9 digit codes were implemented replacing the old style codes.  We're only interested in changes after this point.
   select(-GEOGNMW, -GEOGNMW_P)
 
-# TODO: can I add in regions and countries? 
-
 # add columns to specify whether the changes involve merges and/or splits
 
 # merges are defined as multiple codes becoming a single code, so there will be 
@@ -130,7 +128,7 @@ if(nrow(split_rows != 0)) {
   warning("There have been new splits added to the code change database. Look at the boundary change legislation to see if these are minor changes which can be converted to simple code changes as done for previous splits") 
 }
 
-# TODO check that dates are in the form DD/MM/YYYY
+# TODO check that dates have all been read across OK
 
 all_lad_codes_dates <- read.csv("data-raw/ChangeHistory.csv", stringsAsFactors = FALSE) %>%
   filter(ENTITYCD %in% geogs_of_interest) %>%
