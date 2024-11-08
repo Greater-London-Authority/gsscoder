@@ -32,7 +32,7 @@
 # "SI_TITLE"    title for the legislation that created the new code
 # "OPER_DATE"   date that the code became operational
 # "TERM_DATE"   date that the code was terminated
-# "PARENTCD" 
+# "PARENTCD"    code of the parent geography
 # "ENTITYCD"    first part of the code that specifies the geography level that it is describing
 # "OWNER"
 # "STATUS"      whether the code is 'Live', 'live' or 'terminated'
@@ -44,6 +44,30 @@
 
 library(dplyr)
 library(stringr)
+
+# - W06 ------------- W92
+# - E06 ------- E12 - E92
+# - E07 - E10 - E12 - E92
+# - E08 ------- E12 - E92
+# - E09 ------- E12 - E92
+
+
+entity_levels <- list(
+  data.frame("W06", "lad", NA, "W92"),
+  data.frame("E06", "lad", NA, "E12"),
+  data.frame("E07", "lad", NA, "E10"),
+  data.frame("E08", "lad", NA, "E12"),
+  data.frame("E09", "lad", NA, "E12"),
+  data.frame("E10", "county", NA, "E12"),
+  data.frame("E12", "region", NA, "E92"),
+  data.frame("E92", "country", NA, NA),
+  data.frame("W92", "country", "region", NA)) %>% 
+  lapply(FUN = function(x) setNames(x, c("entity_type",
+                                         "level",
+                                         "alt_level",
+                                         "parent_entity"))) %>% 
+  bind_rows() %>% 
+  data.frame()
 
 code_changes <- read.csv("data-raw/Changes.csv", stringsAsFactors = FALSE)
 
@@ -59,13 +83,8 @@ if (database_date > Sys.Date()) warning("The Code History Database Date given is
 if (database_date < as.Date("2009-01-01")) stop("The Code History Database Date cannot be any earlier than 2009-01-01")
 
 
-geogs_of_interest <- c("E06", "E07", "E08", "E09", "W06") # LAD level geographies only
-# geogs_of_interest <- c("E06", "E07", "E08", "E09", "W06",
-#                       "E10", #"E11", "W10",
-#                       "E12",
-#                       #"E13",
-#                       "E92", "W92", "S92", "N92") # LAD level geographies and above
-lad_code_changes <- filter(code_changes, ENTITYCD %in% geogs_of_interest) %>% # LAD level geographies only
+geogs_of_interest <- unique(entity_levels$entity_type)
+code_changes <- filter(code_changes, ENTITYCD %in% geogs_of_interest) %>% # LAD level and parent geographies only
   mutate(old_entity = substr(GEOGCD_P, 1, 3)) %>%
   filter(old_entity %in% geogs_of_interest) %>% # many of the code changes in the database are from 2009 when the new 9 digit codes were implemented replacing the old style codes.  We're only interested in changes after this point.
   select(-GEOGNMW, -GEOGNMW_P)
@@ -81,12 +100,12 @@ lad_code_changes <- filter(code_changes, ENTITYCD %in% geogs_of_interest) %>% # 
 # a couple of code changes involve both splits and merges where a part of one LA
 # has been moved into another
 
-merges <- count(lad_code_changes, GEOGCD) %>% filter(n>1)
-splits <- count(lad_code_changes, GEOGCD_P) %>% filter(n>1)
+merges <- count(code_changes, GEOGCD) %>% filter(n>1)
+splits <- count(code_changes, GEOGCD_P) %>% filter(n>1)
 
-lad_code_changes <- lad_code_changes %>% mutate(split = ifelse(GEOGCD_P %in% splits$GEOGCD_P, TRUE, FALSE),
-                                      merge = ifelse(GEOGCD %in% merges$GEOGCD, TRUE, FALSE),
-                                      OPER_DATE = as.Date(OPER_DATE, "%d/%m/%Y")) %>%
+code_changes <- code_changes %>% mutate(split = ifelse(GEOGCD_P %in% splits$GEOGCD_P, TRUE, FALSE),
+                                                merge = ifelse(GEOGCD %in% merges$GEOGCD, TRUE, FALSE),
+                                                OPER_DATE = as.Date(OPER_DATE, "%d/%m/%Y")) %>%
   select(changed_to_code = GEOGCD,
          changed_to_name = GEOGNM,
          changed_from_code = GEOGCD_P,
@@ -113,7 +132,7 @@ descs <- c("The Gateshead and Northumberland (Boundary Change) Order 2013",
            "The East Hertfordshire and Stevenage (Boundary Change) Order 2013", 
            "The Merthyr Tydfil and Powys (Areas) Order 2009")
 
-lad_code_changes <- lad_code_changes %>%
+code_changes <- code_changes %>%
   filter(!(changed_from_code == "E08000020" & changed_to_code == "E06000057"), # Gateshead to Northumberland
          !(changed_from_code == "E07000097" & changed_to_code == "E07000243"), # East Hertfordshire to Stevenage
          !(changed_from_code == "W06000007" & changed_to_code == "W06000024")) %>% # Powys to Merthyr Tydfil
@@ -121,7 +140,7 @@ lad_code_changes <- lad_code_changes %>%
          merge = ifelse(desc %in% descs, FALSE, merge))
 
 # check if any other splits have been added since the ones dealt with above
-split_rows <- filter(lad_code_changes, split == TRUE)
+split_rows <- filter(code_changes, split == TRUE)
 
 if(nrow(split_rows != 0)) { 
   print(split_rows)
@@ -130,25 +149,39 @@ if(nrow(split_rows != 0)) {
 
 # TODO check that dates have all been read across OK
 
-all_lad_codes_dates <- read.csv("data-raw/ChangeHistory.csv", stringsAsFactors = FALSE) %>%
+all_codes_dates <- read.csv("data-raw/ChangeHistory.csv", stringsAsFactors = FALSE) %>%
   filter(ENTITYCD %in% geogs_of_interest) %>%
   mutate(start_date = as.Date(OPER_DATE, "%d/%m/%Y"),
-         end_date = as.Date(TERM_DATE, "%d/%m/%Y")) %>%
+         end_date = as.Date(TERM_DATE, "%d/%m/%Y"),
+         parent_entity = substr(PARENTCD, 1, 3)) %>%
   select(gss_code = GEOGCD,
          gss_name = GEOGNM,
          desc = SI_TITLE,
          entity_type = ENTITYCD,
+         parent_cd = PARENTCD,
+         parent_entity,
          start_date,
          end_date,
          status = STATUS)
 
+# check that all the parent entities follow the expected patterns
+parent_check <- all_codes_dates %>% select(entity_type, parent_entity) %>%
+  unique() %>% arrange(entity_type) %>%
+  mutate(parent_entity = ifelse(parent_entity == "", NA, parent_entity))
+
+entity_level_check <- entity_levels %>% select(entity_type, parent_entity) %>% arrange(entity_type)
+
+if (!all.equal(parent_check, entity_level_check)) stop("The parent codes are not as expected in all_codes_dates")
+rm(parent_check, entity_level_check)
+
 # TODO check for any duplicate gss_codes with overlapping dates. 
 
-saveRDS(all_lad_codes_dates, "data-raw/all_lad_codes_dates.rds")
-saveRDS(lad_code_changes, "data-raw/lad_code_changes.rds")
+saveRDS(entity_levels, "data-raw/geog_levels.rds")
+saveRDS(all_codes_dates, "data-raw/all_codes_dates.rds")
+saveRDS(code_changes, "data-raw/code_changes.rds")
 saveRDS(database_date, "data-raw/database_date.rds")
 
 
-rm(code_changes, all_lad_codes_dates, lad_code_changes, split_rows, descs, database_date, geogs_of_interest)
+rm(entity_levels, code_changes, all_codes_dates, split_rows, descs, database_date, geogs_of_interest)
 
 

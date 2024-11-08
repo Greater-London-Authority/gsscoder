@@ -1,6 +1,6 @@
 library(dplyr)
 
-all_codes <- readRDS("data-raw/all_lad_codes_dates.rds") %>%
+all_codes <- readRDS("data-raw/all_codes_dates.rds") %>%
   mutate(start_date = if_else(start_date == as.Date("2009-01-01"), # change to the day before so that the starting set of codes is given as 2008 (there were more changes later in 2009)
                              as.Date("2008-12-31"), 
                              start_date))
