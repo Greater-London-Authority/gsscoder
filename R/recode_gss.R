@@ -43,10 +43,10 @@ recode_gss <- function(df_in,
                        aggregate_data = TRUE) {
   
   # assign code changes to new variable as it will be altered below. 
-  code_changes <- lad_code_changes # lad_code_changes is an internal package data variable stored in R/sysdata.rda
+  code_changes <- code_changes # code_changes is an internal package data variable stored in R/sysdata.rda
   
   # names are for checking that none of the columns contain LA names
-  la_names <- all_lad_codes_dates %>% # all_lad_codes_dates is an internal package data variable stored in R/sysdata.rda
+  la_names <- all_codes_dates %>% # all_codes_dates is an internal package data variable stored in R/sysdata.rda
     select(gss_name) %>% unique() %>% pull()
   
   

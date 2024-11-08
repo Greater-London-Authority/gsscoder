@@ -64,7 +64,7 @@ add_gss_names <- function(df_in,
   }
   
   
-  code_names <- all_lad_codes_dates %>% # all_lad_codes_dates is an internal package data variable stored in R/sysdata.rda
+  code_names <- all_codes_dates %>% # all_codes_dates is an internal package data variable stored in R/sysdata.rda
     filter(start_date <= gss_date, ( is.na(end_date) | end_date >= gss_date )) %>%
     select(gss_code, gss_name) %>%
     unique()

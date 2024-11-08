@@ -19,10 +19,13 @@
 #' or gss_year can be defined. Defaults to \code{NA}) 
 #' @param expect_complete Logical. If set to TRUE a warning will be given if there are 
 #' codes which are not in df_in but were operational on the date/year given. Defaults to \code{FALSE})
+#' @param geogs String or list of strings. Specifies the level(s) of geography expected.
+#' Allowed strings are: \code{"lad"}, \code{"region"}, \code{"country"}. Defaults to \code{"lad"}.
+#' If include_wales is TRUE and "region" is specified then Wales will be counted as a region.
 #' @param include_wales Logical. If set to TRUE when expect_complete is TRUE, warnings
 #' will be given for missing Welsh codes as well as English ones. Defaults to \code{FALSE})
 #' 
-#' @return Does't return anything
+#' @return Doesn't return anything
 #' 
 #' @import dplyr
 #' @importFrom lubridate is.Date
@@ -35,12 +38,16 @@ check_gss_codes <- function(df_in,
                             gss_date = NA, 
                             gss_year = NA, 
                             expect_complete = FALSE,
+                            geogs = "lad",
                             include_wales = FALSE) {
   
-  .validate_check_gss_codes(df_in, col_code, gss_date, gss_year, expect_complete, include_wales)
+  .validate_check_gss_codes(df_in, col_code, gss_date, gss_year, expect_complete, geogs, include_wales)
   
-  code_dates <- all_lad_codes_dates %>% # all_lad_codes_dates is an internal package data variable stored in R/sysdata.rda
-    select(-status)
+  entities <- geog_levels %>% filter(level %in% geogs | alt_level %in% geogs)
+  
+  code_dates <- all_codes_dates %>% # all_codes_dates is an internal package data variable stored in R/sysdata.rda
+    select(-status) %>%
+    filter(entity_type %in% entities$entity_type)
   
   if (is.na(gss_date)) {gss_date <- as.Date(paste0(gss_year, "-12-31"))}
   
@@ -108,6 +115,9 @@ check_gss_codes <- function(df_in,
   
   assertthat::assert_that(include_wales %in% c(TRUE, FALSE),
                           msg = "in check_gss_codes include_wales must be set to TRUE or FALSE")
+  
+  assertthat::assert_that(all(geogs %in% geog_levels$level),
+                          msg = paste("in check_gss_codes geogs must only contain:", paste(unique(geog_levels$level), collapse = ", ")))
   
   
   # other validations
