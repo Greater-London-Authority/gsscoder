@@ -20,8 +20,10 @@ get_year_codes <- function(year) {
   end_of_year <- as.Date(paste0(as.character(year), "-12-31"))
   data <- all_codes %>%
     filter(start_date <= end_of_year,
-           (is.na(end_date) | end_date >= end_of_year)) %>%
+           (is.na(end_date) | end_date >= end_of_year),
+           !grepl("E10", gss_code)) %>%
     select(gss_code) %>%
+    mutate(entity = substr(gss_code, 1,3)) %>%
     arrange(gss_code)
   return(data)
 }
@@ -36,7 +38,8 @@ get_year_names <- function(year) {
   end_of_year <- as.Date(paste0(as.character(year), "-12-31"))
   data <- all_codes %>%
     filter(start_date <= end_of_year,
-           (is.na(end_date) | end_date >= end_of_year)) %>%
+           (is.na(end_date) | end_date >= end_of_year),
+           !grepl("E10", gss_code)) %>%
     select(gss_name) %>%
     arrange(gss_name)
   return(data)
@@ -51,8 +54,10 @@ get_year_codes_names <- function(year) {
   end_of_year <- as.Date(paste0(as.character(year), "-12-31"))
   data <- all_codes %>%
     filter(start_date <= end_of_year,
-           (is.na(end_date) | end_date >= end_of_year)) %>%
-    select(gss_code, gss_name) %>%
+           (is.na(end_date) | end_date >= end_of_year),
+           !grepl("E10", gss_code)) %>%
+    mutate(entity = substr(gss_code, 1,3)) %>%
+    select(gss_code, entity, gss_name) %>%
     arrange(gss_code)
   return(data)
 }
