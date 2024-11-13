@@ -19,7 +19,8 @@
 #' or gss_year can be defined. Defaults to \code{NA}) 
 #' @param expect_complete Logical. If set to TRUE a warning will be given if there are 
 #' codes which are not in df_in but were operational on the date/year given. Defaults to \code{FALSE})
-#' @param geogs String or list of strings. Specifies the level(s) of geography expected.
+#' @param geogs NA, string or list of strings. Specifies the level(s) of geography expected. If NA,
+#' the function will expect all geography levels where there is at least one example present in the data.
 #' Allowed strings are: \code{"lad"}, \code{"region"}, \code{"country"}. Defaults to \code{"lad"}.
 #' If include_wales is TRUE and "region" is specified then Wales will be counted as a region.
 #' @param include_wales Logical. If set to TRUE when expect_complete is TRUE, warnings
@@ -32,16 +33,32 @@
 #' 
 #' @export
 
-
 check_gss_codes <- function(df_in, 
                             col_code = "gss_code",
                             gss_date = NA, 
                             gss_year = NA, 
                             expect_complete = FALSE,
-                            geogs = "lad",
+                            geogs = NA,
                             include_wales = FALSE) {
   
   .validate_check_gss_codes(df_in, col_code, gss_date, gss_year, expect_complete, geogs, include_wales)
+  
+  df_in <- df_in %>%
+    rename("gss_code" = !!col_code)
+  
+  if (all(is.na(geogs))) {
+    df_in_entities <- df_in %>% 
+      mutate(entity = substr(gss_code, 1, 3)) %>%
+      unique() %>%
+      pull()
+    
+    if (!all(df_in_entities %in% geog_levels$entity_type)) {
+      print(df_in_entities[!df_in_entities %in% geog_levels$entity_type])
+      stop("in check_gss_codes the data in df_in contains geography levels that the function can't handle (listed above)")
+    }
+    
+    geogs <- get_gss_levels(df_in)
+  }
   
   entities <- geog_levels %>% filter(level %in% geogs | alt_level %in% geogs)
   
@@ -51,14 +68,11 @@ check_gss_codes <- function(df_in,
   
   if (is.na(gss_date)) {gss_date <- as.Date(paste0(gss_year, "-12-31"))}
   
-  df_in <- df_in %>%
-    rename("gss_code" = !!col_code)
-  
   # find any unexpected/missing codes
   expected_codes <- filter(code_dates, start_date <= gss_date & (end_date >= gss_date | is.na(end_date)))
   
   unexpected_codes <- filter(df_in, !gss_code %in% expected_codes$gss_code) %>% pull(gss_code) %>% unique()
-  unexpected_code_details <- filter(code_dates, gss_code %in% unexpected_codes)
+  unexpected_code_details <- filter(all_codes_dates, gss_code %in% unexpected_codes)
   
   if (include_wales == FALSE) {
     code_dates <- filter(code_dates, !grepl("^W", gss_code))
@@ -95,7 +109,7 @@ check_gss_codes <- function(df_in,
   
 }
 
-.validate_check_gss_codes <- function(df_in, col_code, gss_date, gss_year, expect_complete, include_wales) {
+.validate_check_gss_codes <- function(df_in, col_code, gss_date, gss_year, expect_complete, geogs, include_wales) {
   
   # validate input variable data types
   assertthat::assert_that(is.data.frame(df_in),
@@ -116,8 +130,8 @@ check_gss_codes <- function(df_in,
   assertthat::assert_that(include_wales %in% c(TRUE, FALSE),
                           msg = "in check_gss_codes include_wales must be set to TRUE or FALSE")
   
-  assertthat::assert_that(all(geogs %in% geog_levels$level),
-                          msg = paste("in check_gss_codes geogs must only contain:", paste(unique(geog_levels$level), collapse = ", ")))
+  assertthat::assert_that(all(geogs %in% c(NA, geog_levels$level)),
+                          msg = paste("in check_gss_codes geogs must only contain: NA,", paste(unique(geog_levels$level), collapse = ", ")))
   
   
   # other validations
