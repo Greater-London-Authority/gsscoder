@@ -42,8 +42,8 @@ recode_gss <- function(df_in,
                        recode_to_year,
                        aggregate_data = TRUE) {
   
-  # assign code changes to new variable as it will be altered below. 
-  code_changes <- code_changes # code_changes is an internal package data variable stored in R/sysdata.rda
+  # assign code changes to new variable as it will be altered if the recoding is going back in time. 
+  gss_code_changes <- code_changes # code_changes is an internal package data variable stored in R/sysdata.rda
   
   # names are for checking that none of the columns contain LA names
   la_names <- all_codes_dates %>% # all_codes_dates is an internal package data variable stored in R/sysdata.rda
@@ -67,7 +67,7 @@ recode_gss <- function(df_in,
     #   * changed_to becomes changed_from and vice versa
     #   * splits become merges and vice versa
     #   * year becomes year-1 as year-1 is the first year that changes when going backwards
-    code_changes <- code_changes %>%
+    gss_code_changes <- gss_code_changes %>%
       mutate(split2 = ifelse(merge == TRUE, TRUE, FALSE),
              merge2 = ifelse(split == TRUE, TRUE, FALSE)) %>%
       select(-split, -merge) %>%
@@ -84,7 +84,7 @@ recode_gss <- function(df_in,
   for (my_year in recode_from_year:recode_to_year) {
     
     # append any new rows with codes in the data
-    new_rows <- filter(code_changes, changed_from_code %in% df$gss_code, year == my_year) %>%
+    new_rows <- filter(gss_code_changes, changed_from_code %in% df$gss_code, year == my_year) %>%
       select(changed_to_code, changed_from_code)
     
     if(nrow(new_rows) != 0){
@@ -92,7 +92,7 @@ recode_gss <- function(df_in,
     }
     
     # update any rows which are already in the lookup
-    update_rows <- filter(code_changes, changed_from_code %in% lookup$changed_to_code, year == my_year) %>%
+    update_rows <- filter(gss_code_changes, changed_from_code %in% lookup$changed_to_code, year == my_year) %>%
       select(changed_from_code, changed_to_code)
     
     if (nrow(update_rows) != 0 ) {
