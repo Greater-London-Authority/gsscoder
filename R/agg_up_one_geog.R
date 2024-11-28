@@ -74,9 +74,16 @@ agg_up_one_geog <- function(df_in,
     
   }
   
-  # TODO add error if there are any codes which don't have parent codes.
-  
   df <- df_in %>% left_join(parent_codes, by = "gss_code")
+  
+  # check that there are no missing parent codes
+  invalid_parent_codes <- filter(df, !grepl("^[EW]\\d{8}$", parent_cd))
+  
+  if(nrow(invalid_parent_codes) > 0) {
+    print(invalid_parent_codes)
+    stop("In agg_up_one_geog, there are gss codes in df_in which do not have valid parent codes (see above).")
+  }
+  
   
   # Some LAD codes have E10 codes (counties) as parents but the rest have regions.
   # For any codes with E10 as a parent, these will need to be parented again to get from county to region to match the rest of the LADs. 
@@ -186,6 +193,21 @@ agg_up_one_geog <- function(df_in,
   
   assertthat::assert_that(!(is.na(gss_date) & is.na(gss_year)),
                           msg = "in agg_up_one_geog one of gss_date or gss_year must be specified")
+  
+  if (is.na(col_name)) {
+    # check that none of the columns contain geography names
+    la_names <- all_codes_dates %>% # all_codes_dates is an internal package data variable stored in R/sysdata.rda
+      select(gss_name) %>% unique() %>% pull()
+    
+    poss_name_cols <- df_in %>% 
+      select(where(is.factor)|where(is.character)) %>%
+      mutate(across(everything(), as.character)) %>%
+      select(where(~any(.x %in% la_names))) %>%
+      names()
+    
+    # TODO make a more intelligent geographic area details check if there is a unique value of any column for each GSS code
+    if (length(poss_name_cols > 0)) {warning(paste("in agg_up_one_geog LA names have been detected in the input dataframe. If this is an LA name column please remove it before passing to agg_up_one_geog:", paste(poss_name_cols, collapse = ", ")))}
+  }
   
   invisible()
 }
