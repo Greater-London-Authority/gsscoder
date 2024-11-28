@@ -13,10 +13,10 @@
 #' @param df_in A data frame containing gss_codes and data.
 #' @param col_code A string. The column which contains gss codes (defaults to
 #'   \code{gss_code}).
-#' @param col_dataA string or character vector. The column(s) that contain the
-#'   data to be aggregated. Defaults to last column of input dataframe. At least 
+#' @param col_data A string or character vector. The column(s) that contain the
+#'   data to be aggregated. Defaults to 'value'. At least 
 #'   one data column must be specified. 
-#' @param fun Character Function to be applied in aggregating data. Either 'sum'
+#' @param fun Character. Function to be applied in aggregating data. Either 'sum'
 #'   or 'mean'. Default \code{'sum'}.
 #' @param recode_from_year Numeric. Year of geography of the input dataframe. 
 #' @param recode_to_year Numeric. Conform to geography in which year. 
@@ -215,8 +215,7 @@ recode_gss <- function(df_in,
   
   for(i in length(col_data)){
     
-    #TODO check that df_in is a dataframe
-    assertthat::assert_that(col_data[i] %in% names(df_in),
+        assertthat::assert_that(col_data[i] %in% names(df_in),
                             msg = paste0("in recode_gss_codes, specified col_data'", col_data[i],
                                         "' not in input dataframe"))
   }
