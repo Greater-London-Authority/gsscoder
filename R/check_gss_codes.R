@@ -5,7 +5,7 @@
 #' and can also check for completeness covering England and optionally Wales.
 #'
 #' Throws an error if there are codes present which weren't live on the give date,
-#' and warns for any missing codes if expect_complete is set to TRUE. 
+#' or if there are any missing codes if expect_complete is set to TRUE. 
 #' 
 #'
 #' @param df_in A data frame containing gss_codes and data.
@@ -17,9 +17,9 @@
 #' @param gss_year Numeric or Integer. The year against which to check the gss codes. 
 #' Equivalent to setting gss_date to 31st December of that year. Only one of gss_date 
 #' or gss_year can be defined. Defaults to \code{NA}) 
-#' @param expect_complete Logical. If set to TRUE a warning will be given if there are 
+#' @param expect_complete Logical. If set to TRUE an error will be given if there are 
 #' codes which are not in df_in but were operational on the date/year given. Defaults to \code{FALSE})
-#' @param include_wales Logical. If set to TRUE when expect_complete is TRUE, warnings
+#' @param include_wales Logical. If set to TRUE when expect_complete is TRUE, an error
 #' will be given for missing Welsh codes as well as English ones. Defaults to \code{FALSE})
 #' 
 #' @return Does't return anything
@@ -63,7 +63,7 @@ check_gss_codes <- function(df_in,
   unexpected_codes_msg <- ""
   missing_codes_msg <- ""
   
-  if (length(unexpected_codes != 0)) {
+  if (length(unexpected_codes) != 0) {
     
     print("UNEXPECTED CODES:")
     print(unexpected_codes)
@@ -72,7 +72,7 @@ check_gss_codes <- function(df_in,
     
   }
   
-  if (nrow(missing_codes !=0 & expect_complete == TRUE)) { 
+  if (nrow(missing_codes) !=0 & expect_complete == TRUE) { 
 
     print("MISSING CODES:")
     print(missing_codes)
@@ -80,7 +80,7 @@ check_gss_codes <- function(df_in,
    
   }
   
-  if (nrow(missing_codes !=0 & expect_complete == TRUE) | nrow(unexpected_code_details != 0)) {
+  if ((nrow(missing_codes) !=0 & expect_complete == TRUE) | nrow(unexpected_code_details) != 0) {
     stop(paste(unexpected_codes_msg, missing_codes_msg))
   }
   
