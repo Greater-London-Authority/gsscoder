@@ -29,7 +29,6 @@
 #'
 #' @import dplyr
 #' @import data.table
-#' @importFrom dtplyr lazy_dt
 #' @importFrom assertthat assert_that
 #' 
 #' @export
@@ -141,7 +140,6 @@ recode_gss <- function(df_in,
     
     if(fun == "sum"){
       df <- df %>%
-        lazy_dt() %>%
         group_by(across(!!col_aggregation)) %>%
         summarise_all(.funs = sum) %>%
         as.data.frame()
@@ -149,7 +147,6 @@ recode_gss <- function(df_in,
     
     if(fun == "mean"){
       df <- df %>%
-        lazy_dt() %>%
         group_by(across(!!col_aggregation)) %>%
         summarise_all(.funs = mean) %>%
         as.data.frame()
