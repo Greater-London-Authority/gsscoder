@@ -13,14 +13,14 @@
 #' @param df_in A data frame containing gss_codes and data.
 #' @param col_code A string. The column which contains gss codes (defaults to
 #'   \code{gss_code}).
-#' @param col_dataA string or character vector. The column(s) that contain the
+#' @param col_data A string or character vector. The column(s) that contain the
 #'   data to be aggregated. Defaults to last column of input dataframe. At least 
 #'   one data column must be specified. 
-#' @param fun Character Function to be applied in aggregating data. Either 'sum'
+#' @param fun Character. Function to be applied in aggregating data. Either 'sum'
 #'   or 'mean'. Default \code{'sum'}.
 #' @param recode_from_year Numeric. Year of geography of the input dataframe. 
 #' @param recode_to_year Numeric. Conform to geography in which year. 
-#' @param aggregate_data Logical. If set to true multiple instances of the same
+#' @param aggregate_data Logical. If set to true multiple instances of the same 'recoded to'
 #'   gss code will be aggregated using the function specified in \code{fun} parameter.
 #'   Default to \code{TRUE}.
 #'

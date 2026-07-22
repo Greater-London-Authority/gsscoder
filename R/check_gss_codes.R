@@ -22,7 +22,7 @@
 #' @param include_wales Logical. If set to TRUE when expect_complete is TRUE, an error
 #' will be given for missing Welsh codes as well as English ones. Defaults to \code{FALSE})
 #' 
-#' @return Does't return anything
+#' @return Doesn't return anything
 #' 
 #' @import dplyr
 #' @importFrom lubridate is.Date
