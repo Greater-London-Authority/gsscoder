@@ -10,7 +10,7 @@
 #' @param col_code A string. The name of the column which contains gss codes (defaults to
 #'   \code{gss_code}).
 #'
-#' @return An integer  The year of the first December that the 
+#' @return An integer.  The year of the first December that the 
 #' codes were operational
 #' 
 #' @import dplyr
@@ -22,7 +22,7 @@ get_gss_year <- function(df_in,
   
   date_range <- get_gss_date(df_in, col_code)
   
-  # TODO check that date_range$earliest is a date with formate "yyyy-mm-dd"
+  # TODO check that date_range$earliest is a date with format "yyyy-mm-dd"
   
   year <- date_range$earliest %>% 
     format('%Y') %>% as.numeric()
