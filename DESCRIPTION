@@ -9,3 +9,8 @@ Suggests:
 Config/testthat/edition: 3
 Depends: 
     R (>= 2.10)
+Imports: 
+    assertthat,
+    data.table,
+    dplyr,
+    lubridate

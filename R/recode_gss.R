@@ -20,7 +20,7 @@
 #'   or 'mean'. Default \code{'sum'}.
 #' @param recode_from_year Numeric. Year of geography of the input dataframe. 
 #' @param recode_to_year Numeric. Conform to geography in which year. 
-#' @param aggregate_data Logical. If set to true multiple instances of the same
+#' @param aggregate_data Logical. If set to true multiple instances of the same 'recoded to'
 #'   gss code will be aggregated using the function specified in \code{fun} parameter.
 #'   Default to \code{TRUE}.
 #'
@@ -29,7 +29,6 @@
 #'
 #' @import dplyr
 #' @import data.table
-#' @importFrom dtplyr lazy_dt
 #' @importFrom assertthat assert_that
 #' 
 #' @export
@@ -141,7 +140,6 @@ recode_gss <- function(df_in,
     
     if(fun == "sum"){
       df <- df %>%
-        lazy_dt() %>%
         group_by(across(!!col_aggregation)) %>%
         summarise_all(.funs = sum) %>%
         as.data.frame()
@@ -149,7 +147,6 @@ recode_gss <- function(df_in,
     
     if(fun == "mean"){
       df <- df %>%
-        lazy_dt() %>%
         group_by(across(!!col_aggregation)) %>%
         summarise_all(.funs = mean) %>%
         as.data.frame()
