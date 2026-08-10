@@ -5,7 +5,8 @@ geog_levels <- readRDS("data-raw/geog_levels.rds")
 test_codes <- readRDS("data-raw/test_codes.rds")
 test_names <- readRDS("data-raw/test_names.rds")
 test_codes_names <- readRDS("data-raw/test_codes_names.rds")
+lad_region_country <- readRDS("data-raw/lad_region_country.rds")
 
 
-usethis::use_data(all_codes_dates, code_changes, geog_levels, database_date, test_codes, test_names, test_codes_names, internal = TRUE, overwrite = TRUE)
-rm(all_codes_dates, code_changes, geog_levels, database_date, test_codes, test_names, test_codes_names)
+usethis::use_data(all_codes_dates, code_changes, geog_levels, database_date, test_codes, test_names, test_codes_names, lad_region_country, internal = TRUE, overwrite = TRUE)
+rm(all_codes_dates, code_changes, geog_levels, database_date, test_codes, test_names, test_codes_names, lad_region_country)

@@ -176,12 +176,69 @@ rm(parent_check, entity_level_check)
 
 # TODO check for any duplicate gss_codes with overlapping dates. 
 
+## Create lookup table between las, regions and country
+entities <- list(lad = c("E06", "E07", "E08", "E09", "W06"),
+                 county = "E10",
+                 region = "E12",
+                 country = c("E92", "W92"))
+
+filter_to_geog <- function(df, entity_list) {
+  df_return <- df %>%
+    filter(entity_type %in% entity_list) %>%
+    select(gss_code, parent_cd, start_date, end_date)
+  
+  return(df_return)
+}
+
+codes_parents <- lapply(entities, filter_to_geog, df = all_codes_dates)
+
+# convert the county parent codes to region
+lad_region <- codes_parents$lad %>%
+  rename(lad = gss_code, start_date_la = start_date, end_date_la = end_date) %>%
+  left_join(codes_parents$county, by = c("parent_cd" = "gss_code")) %>% 
+  rename(start_date_county = start_date, 
+         end_date_county = end_date, 
+         region = parent_cd.y) %>%
+  mutate(start_date = pmax(start_date_la, start_date_county), # start and end dates for rows which have counties 
+         end_date = as.Date(
+           ifelse(is.na(end_date_la) & is.na(end_date_county), 
+                  NA,
+                  pmin(end_date_la, end_date_county, na.rm = TRUE)) # NA in the end date means the code is still active so is the 'max' date
+         )
+  ) %>%
+  mutate(start_date = as.Date(ifelse(is.na(region), start_date_la, start_date)), 
+         end_date = as.Date(ifelse(is.na(region), end_date_la, end_date)),
+         region = ifelse(is.na(region), parent_cd, region))  
+
+
+# add country codes 
+lad_region_country <- lad_region %>%
+  select(lad, region, start_date, end_date) %>%
+  left_join(rename(codes_parents$region, start_date_region = start_date, end_date_region = end_date), 
+            by = c("region" = "gss_code")) %>%
+  mutate(
+    start_date = as.Date(
+      ifelse(is.na(parent_cd), # For Wales we use the country code as the region code, so there is no parent code
+             start_date, 
+             pmax(start_date, start_date_region))), 
+    end_date = as.Date(
+      ifelse(is.na(end_date) & is.na(end_date_region), 
+             NA,
+             pmin(end_date, end_date_region, na.rm = TRUE))),
+    country = ifelse(grepl("^.92", region), region, parent_cd) # Add the country codes for Wales (region code is also the country code)
+  ) %>%
+  select(lad, region, country, start_date, end_date) %>%
+  unique()
+
+
 saveRDS(entity_levels, "data-raw/geog_levels.rds")
 saveRDS(all_codes_dates, "data-raw/all_codes_dates.rds")
 saveRDS(code_changes, "data-raw/code_changes.rds")
 saveRDS(database_date, "data-raw/database_date.rds")
+saveRDS(lad_region_country, "data-raw/lad_region_country.rds")
 
 
-rm(entity_levels, code_changes, all_codes_dates, split_rows, descs, database_date, geogs_of_interest)
+rm(entity_levels, code_changes, all_codes_dates, split_rows, descs, database_date, geogs_of_interest,
+   entities, filter_to_geog, codes_parents, lad_region, lad_region_country)
 
 
