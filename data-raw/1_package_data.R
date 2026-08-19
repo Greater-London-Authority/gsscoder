@@ -52,7 +52,7 @@ library(stringr)
 # - E09 ------- E12 - E92
 
 
-entity_levels <- list(
+geog_levels <- list(
   data.frame("W06", "lad", NA, "W92"),
   data.frame("E06", "lad", NA, "E12"),
   data.frame("E07", "lad", NA, "E10"),
@@ -83,7 +83,7 @@ if (database_date > Sys.Date()) warning("The Code History Database Date given is
 if (database_date < as.Date("2009-01-01")) stop("The Code History Database Date cannot be any earlier than 2009-01-01")
 
 
-geogs_of_interest <- unique(entity_levels$entity_type)
+geogs_of_interest <- unique(geog_levels$entity_type)
 code_changes <- filter(code_changes, ENTITYCD %in% geogs_of_interest) %>% # LAD level and parent geographies only
   mutate(old_entity = substr(GEOGCD_P, 1, 3)) %>%
   filter(old_entity %in% geogs_of_interest) %>% # many of the code changes in the database are from 2009 when the new 9 digit codes were implemented replacing the old style codes.  We're only interested in changes after this point.
@@ -169,7 +169,7 @@ parent_check <- all_codes_dates %>% select(entity_type, parent_entity) %>%
   unique() %>% arrange(entity_type) %>%
   mutate(parent_entity = ifelse(parent_entity == "", NA, parent_entity))
 
-entity_level_check <- entity_levels %>% select(entity_type, parent_entity) %>% arrange(entity_type)
+entity_level_check <- geog_levels %>% select(entity_type, parent_entity) %>% arrange(entity_type)
 
 if (!all.equal(parent_check, entity_level_check)) stop("The parent codes are not as expected in all_codes_dates")
 rm(parent_check, entity_level_check)
@@ -231,14 +231,15 @@ lad_region_country <- lad_region %>%
   unique()
 
 
-saveRDS(entity_levels, "data-raw/geog_levels.rds")
+saveRDS(entities, "data-raw/entity_levels.rds")
+saveRDS(geog_levels, "data-raw/geog_levels.rds")
 saveRDS(all_codes_dates, "data-raw/all_codes_dates.rds")
 saveRDS(code_changes, "data-raw/code_changes.rds")
 saveRDS(database_date, "data-raw/database_date.rds")
 saveRDS(lad_region_country, "data-raw/lad_region_country.rds")
 
 
-rm(entity_levels, code_changes, all_codes_dates, split_rows, descs, database_date, geogs_of_interest,
+rm(geog_levels, code_changes, all_codes_dates, split_rows, descs, database_date, geogs_of_interest,
    entities, filter_to_geog, codes_parents, lad_region, lad_region_country)
 
 

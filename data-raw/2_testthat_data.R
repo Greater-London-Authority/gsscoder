@@ -65,10 +65,27 @@ get_year_codes_names <- function(year) {
 test_codes_names <- lapply(change_years, get_year_codes_names)
 names(test_codes_names) <- paste0("y",change_years)
 
+#### WITH PARENT CODES ####
+
+get_year_codes_names_parents <- function(year) {
+  end_of_year <- as.Date(paste0(as.character(year), "-12-31"))
+  data <- all_codes %>%
+    filter(start_date <= end_of_year,
+           (is.na(end_date) | end_date >= end_of_year)) %>%
+    mutate(entity = substr(gss_code, 1,3)) %>%
+    select(gss_code, entity, gss_name, parent_cd) %>%
+    arrange(gss_code)
+  return(data)
+}
+test_codes_parents <- lapply(change_years, get_year_codes_names_parents)
+names(test_codes_parents) <- paste0("y",change_years)
+
 saveRDS(test_codes, "data-raw/test_codes.rds")
 saveRDS(test_names, "data-raw/test_names.rds")
 saveRDS(test_codes_names, "data-raw/test_codes_names.rds")
+saveRDS(test_codes_parents, "data-raw/test_codes_parents.rds")
 
-
-rm(all_codes, test_codes, test_names, change_dates, change_years, get_year_codes, get_year_names)
+rm(all_codes, test_codes, test_names, change_dates, change_years, get_year_codes, 
+   get_year_names, test_codes_names, get_year_codes_names, test_codes_parents, 
+   get_year_codes_names_parents)
 
