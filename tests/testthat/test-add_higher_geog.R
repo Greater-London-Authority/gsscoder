@@ -1,19 +1,19 @@
 create_lad_region <- function(df) {
   counties <- df %>% 
-    filter(entity %in% entity_levels$county) %>% 
+    filter(entity %in% .sys_entity_levels$county) %>% 
     select(gss_code, parent_cd)
   lads <- df %>% 
-    filter(entity %in% entity_levels$lad) %>%
+    filter(entity %in% .sys_entity_levels$lad) %>%
     left_join(counties, by = c("parent_cd" = "gss_code")) %>%
     mutate(parent_entity = substr(parent_cd, 1, 3),
-           parent_cd = ifelse(parent_entity %in% entity_levels$county, parent_cd.y, parent_cd)) %>%
+           parent_cd = ifelse(parent_entity %in% .sys_entity_levels$county, parent_cd.y, parent_cd)) %>%
     select(gss_code, entity, gss_name, region = parent_cd)
   return(lads)
 }
 
 create_lad_country <- function(df) {
   lad_country <- df %>%
-    filter(entity %in% entity_levels$lad) %>%
+    filter(entity %in% .sys_entity_levels$lad) %>%
     mutate(country = 
              case_when(substr(gss_code, 1, 1) == "E" ~ "E92000001",
                        substr(gss_code, 1, 1) == "W" ~ "W92000004")) %>%
@@ -23,14 +23,14 @@ create_lad_country <- function(df) {
 
 create_region_country <- function(df) {
   regions <- df %>% 
-    filter(entity %in% entity_levels$region) %>%
+    filter(entity %in% .sys_entity_levels$region) %>%
     select(gss_code, entity, gss_name, country = parent_cd)
   return(regions)
 }
 
-lad_region <- lapply(test_codes_parents, create_lad_region)
-lad_country <- lapply(test_codes_parents, create_lad_country)
-region_country <- lapply(test_codes_parents, create_region_country)
+lad_region <- lapply(.sys_test_codes_parents, create_lad_region)
+lad_country <- lapply(.sys_test_codes_parents, create_lad_country)
+region_country <- lapply(.sys_test_codes_parents, create_region_country)
 
 lad_region_test <- lapply(lad_region, function(x) select(x, -region))
 lad_country_test <- lapply(lad_country, function(x) select(x, -country))

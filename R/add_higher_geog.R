@@ -53,7 +53,7 @@ add_higher_geog <- function(df_in,
   
   check_gss_codes(df, col_code = col_code, gss_date = gss_date, expect_complete = FALSE, geogs = current_geog)
   
-  lookup <- lad_region_country %>%
+  lookup <- .sys_lad_region_country %>%
     select(all_of(c(current_geog, higher_geog)), "start_date", "end_date") %>%
     filter(start_date <= gss_date & (end_date >= gss_date | is.na(end_date))) %>%
     select(-start_date, -end_date) %>%
@@ -114,7 +114,7 @@ add_higher_geog <- function(df_in,
   
   
   # check that current_gss_level is smaller than target_gss_level
-  geog_order = names(lad_region_country)
+  geog_order = names(.sys_lad_region_country)
   assertthat::assert_that(which(geog_order == current_geog) < which(geog_order == higher_geog),
                           msg = paste0("in add_higher_geog: current_geog must be a smaller geography than higher_geog. current_geog was given as '", current_geog, "' and higher_geog was given as '", higher_geog, "'"))
   rm(geog_order)

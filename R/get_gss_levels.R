@@ -27,7 +27,7 @@ get_gss_levels <- function(df_in,
     rename("gss_code" = !!col_code)
   
   
-  entity_lookup <- geog_levels
+  entity_lookup <- .sys_geog_levels
   
   entities <- df_in %>%
     mutate(entity = substr(gss_code,1,3)) %>%

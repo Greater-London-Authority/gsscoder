@@ -1,4 +1,4 @@
-dates <- unique(c(lad_region_country$start_date, lad_region_country$end_date)) %>%
+dates <- unique(c(.sys_lad_region_country$start_date, .sys_lad_region_country$end_date)) %>%
   sort()
 
 check_duplicates <- function(date, df, geog, parent_geog) {
@@ -31,12 +31,12 @@ check_missing <- function(date, df, geog, parent_geog) {
 }
 
 test_that("There are no duplicates in lad_region_country lookup at any point in time", {
-  expect_silent(lapply(dates, check_duplicates, lad_region_country, "lad", "region"))
-  expect_silent(lapply(dates, check_duplicates, lad_region_country, "region", "country"))
+  expect_silent(lapply(dates, check_duplicates, .sys_lad_region_country, "lad", "region"))
+  expect_silent(lapply(dates, check_duplicates, .sys_lad_region_country, "region", "country"))
 })
 
 test_that("There are no missing codes in lad_region_country lookup at any point in time", {
-  expect_silent(lapply(dates, check_missing, lad_region_country, "lad", "region"))
-  expect_silent(lapply(dates, check_missing, lad_region_country, "region", "country"))
+  expect_silent(lapply(dates, check_missing, .sys_lad_region_country, "lad", "region"))
+  expect_silent(lapply(dates, check_missing, .sys_lad_region_country, "region", "country"))
 })
 

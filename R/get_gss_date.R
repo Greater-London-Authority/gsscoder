@@ -30,7 +30,7 @@ get_gss_date <- function(df_in,
   
   # get rid of any duplicates in the gss codes.  So far these have all been due to name changes where the code doesn't change
   # Condense to one entry which gives the start and end date of the code no matter what the name was.
-  code_dates <- all_codes_dates %>% # all_codes_dates is an internal package variable stored in R/sysdata.rda
+  code_dates <- .sys_all_codes_dates %>%
     select(gss_code, entity_type, start_date, end_date, status) %>%
     group_by(gss_code) %>%
     mutate(orig_start_date = start_date,
@@ -77,7 +77,7 @@ get_gss_date <- function(df_in,
                           msg = paste("in get_gss_date, specified col_code", col_code,
                                       "not in input dataframe"))
   
-  assertthat::assert_that(all(df_in[[col_code]] %in% all_codes_dates$gss_code),
+  assertthat::assert_that(all(df_in[[col_code]] %in% .sys_all_codes_dates$gss_code),
                           msg = paste0("in get_gss_date the specified col_code,", col_code, ", contains unrecognised gss codes. Either the codes are incorrect or the gsscoder package code change database is not up to date"))
   
   invisible()

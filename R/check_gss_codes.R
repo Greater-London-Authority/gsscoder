@@ -52,17 +52,17 @@ check_gss_codes <- function(df_in,
       unique() %>%
       pull()
     
-    if (!all(df_in_entities %in% geog_levels$entity_type)) {
-      print(df_in_entities[!df_in_entities %in% geog_levels$entity_type])
+    if (!all(df_in_entities %in% .sys_geog_levels$entity_type)) {
+      print(df_in_entities[!df_in_entities %in% .sys_geog_levels$entity_type])
       stop("in check_gss_codes the data in df_in contains geography levels that the function can't handle (listed above)")
     }
     
     geogs <- get_gss_levels(df_in)
   }
   
-  entities <- geog_levels %>% filter(level %in% geogs | alt_level %in% geogs)
+  entities <- .sys_geog_levels %>% filter(level %in% geogs | alt_level %in% geogs)
   
-  code_dates <- all_codes_dates %>% # all_codes_dates is an internal package data variable stored in R/sysdata.rda
+  code_dates <- .sys_all_codes_dates %>% 
     select(-status) %>%
     filter(entity_type %in% entities$entity_type)
   
@@ -72,7 +72,7 @@ check_gss_codes <- function(df_in,
   expected_codes <- filter(code_dates, start_date <= gss_date & (end_date >= gss_date | is.na(end_date)))
   
   unexpected_codes <- filter(df_in, !gss_code %in% expected_codes$gss_code) %>% pull(gss_code) %>% unique()
-  unexpected_code_details <- filter(all_codes_dates, gss_code %in% unexpected_codes)
+  unexpected_code_details <- filter(.sys_all_codes_dates, gss_code %in% unexpected_codes)
   
   if (include_wales == FALSE) {
     code_dates <- filter(code_dates, !grepl("^W", gss_code))
@@ -130,8 +130,8 @@ check_gss_codes <- function(df_in,
   assertthat::assert_that(include_wales %in% c(TRUE, FALSE),
                           msg = "in check_gss_codes include_wales must be set to TRUE or FALSE")
   
-  assertthat::assert_that(all(geogs %in% c(NA, geog_levels$level)),
-                          msg = paste("in check_gss_codes geogs must only contain: NA,", paste(unique(geog_levels$level), collapse = ", ")))
+  assertthat::assert_that(all(geogs %in% c(NA, .sys_geog_levels$level)),
+                          msg = paste("in check_gss_codes geogs must only contain: NA,", paste(unique(.sys_geog_levels$level), collapse = ", ")))
   
   
   # other validations
@@ -146,12 +146,12 @@ check_gss_codes <- function(df_in,
                           msg = "in check_gss_codes one of gss_date or gss_year must be specified")
   
  
-  database_year <- database_date %>% format('%Y') %>% as.numeric() # database_date is an internal package data variable stored in R/sysdata.rda
+  database_year <- .sys_database_date %>% format('%Y') %>% as.numeric() 
   assertthat::assert_that(is.na(gss_year) | (gss_year >= 2009 & gss_year <= database_year),
                           msg = paste0("in check_gss_codes gss_year must be a number between 2009 and ", database_year, ". If your required year is later than ", database_year ," then check if the gsscoder package code change database needs updating"))
   
-  assertthat::assert_that(is.na(gss_date) | (gss_date >= as.Date("2009-01-01") & gss_date <= database_date),
-                          msg = paste0("in check_gss_codes gss_date must be between 2009-01-01 and ", database_date, ". If your required date is later than ", database_date ," then check if the gsscoder package code change database needs updating"))
+  assertthat::assert_that(is.na(gss_date) | (gss_date >= as.Date("2009-01-01") & gss_date <= .sys_database_date),
+                          msg = paste0("in check_gss_codes gss_date must be between 2009-01-01 and ", .sys_database_date, ". If your required date is later than ", .sys_database_date ," then check if the gsscoder package code change database needs updating"))
   
  
   

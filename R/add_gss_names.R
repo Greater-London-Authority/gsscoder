@@ -64,7 +64,7 @@ add_gss_names <- function(df_in,
   }
   
   
-  code_names <- all_codes_dates %>% # all_codes_dates is an internal package data variable stored in R/sysdata.rda
+  code_names <- .sys_all_codes_dates %>% 
     filter(start_date <= gss_date, ( is.na(end_date) | end_date >= gss_date )) %>%
     select(gss_code, gss_name) %>%
     unique()
@@ -109,12 +109,12 @@ add_gss_names <- function(df_in,
   assertthat::assert_that(!(is.na(gss_date) & is.na(gss_year)),
                           msg = "in add_gss_names one of gss_date or gss_year must be specified")
   
-  database_year <- database_date %>% format('%Y') %>% as.numeric() # database_date is an internal package data variable stored in R/sysdata.rda
+  database_year <- .sys_database_date %>% format('%Y') %>% as.numeric() 
   assertthat::assert_that(is.na(gss_year) | (gss_year >= 2009 & gss_year <= database_year),
                           msg = paste0("in add_gss_names gss_year must be a number between 2009 and ", database_year, ". If your required year is later than ", database_year ," then check if the gsscoder package code change database needs updating"))
   
-  assertthat::assert_that(is.na(gss_date) | (gss_date >= as.Date("2009-01-01") & gss_date <= database_date),
-                          msg = paste0("in add_gss_names gss_date must be between 2009-01-01 and ", database_date, ". If your required date is later than ", database_date ," then check if the gsscoder package code change database needs updating"))
+  assertthat::assert_that(is.na(gss_date) | (gss_date >= as.Date("2009-01-01") & gss_date <= .sys_database_date),
+                          msg = paste0("in add_gss_names gss_date must be between 2009-01-01 and ", .sys_database_date, ". If your required date is later than ", .sys_database_date ," then check if the gsscoder package code change database needs updating"))
 
   
   invisible()
