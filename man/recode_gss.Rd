@@ -31,7 +31,7 @@ or 'mean'. Default \code{'sum'}.}
 
 \item{recode_to_year}{Numeric. Conform to geography in which year.}
 
-\item{aggregate_data}{Logical. If set to true multiple instances of the same
+\item{aggregate_data}{Logical. If set to true multiple instances of the same 'recoded to'
 gss code will be aggregated using the function specified in \code{fun} parameter.
 Default to \code{TRUE}.}
 }

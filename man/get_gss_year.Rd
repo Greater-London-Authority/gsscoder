@@ -13,7 +13,7 @@ get_gss_year(df_in, col_code = "gss_code")
 \code{gss_code}).}
 }
 \value{
-An integer  The year of the first December that the 
+An integer.  The year of the first December that the 
 codes were operational
 }
 \description{
