@@ -232,7 +232,6 @@ lad_region_country <- lad_region %>%
 
 
 saveRDS(entities, "data-raw/entity_levels.rds")
-saveRDS(geog_levels, "data-raw/geog_levels.rds")
 saveRDS(all_codes_dates, "data-raw/all_codes_dates.rds")
 saveRDS(code_changes, "data-raw/code_changes.rds")
 saveRDS(database_date, "data-raw/database_date.rds")

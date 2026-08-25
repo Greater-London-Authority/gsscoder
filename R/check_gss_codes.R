@@ -46,25 +46,30 @@ check_gss_codes <- function(df_in,
   df_in <- df_in %>%
     rename("gss_code" = !!col_code)
   
+  known_entites <- unname(unlist(.sys_entity_levels))
+  
   if (all(is.na(geogs))) {
     df_in_entities <- df_in %>% 
       mutate(entity = substr(gss_code, 1, 3)) %>%
       unique() %>%
       pull()
     
-    if (!all(df_in_entities %in% .sys_geog_levels$entity_type)) {
-      print(df_in_entities[!df_in_entities %in% .sys_geog_levels$entity_type])
+    if (!all(df_in_entities %in% known_entites)) {
+      print(df_in_entities[!df_in_entities %in% known_entites])
       stop("in check_gss_codes the data in df_in contains geography levels that the function can't handle (listed above)")
     }
     
     geogs <- get_gss_levels(df_in)
   }
   
-  entities <- .sys_geog_levels %>% filter(level %in% geogs | alt_level %in% geogs)
+  entities <- .sys_entity_levels[geogs] %>% unname() %>% unlist()
+  if ("region" %in% geogs & include_wales) {
+    entities <- c(entities, "W92") %>% unique()
+  }
   
   code_dates <- .sys_all_codes_dates %>% 
     select(-status) %>%
-    filter(entity_type %in% entities$entity_type)
+    filter(entity_type %in% entities)
   
   if (is.na(gss_date)) {gss_date <- as.Date(paste0(gss_year, "-12-31"))}
   
@@ -130,8 +135,8 @@ check_gss_codes <- function(df_in,
   assertthat::assert_that(include_wales %in% c(TRUE, FALSE),
                           msg = "in check_gss_codes include_wales must be set to TRUE or FALSE")
   
-  assertthat::assert_that(all(geogs %in% c(NA, .sys_geog_levels$level)),
-                          msg = paste("in check_gss_codes geogs must only contain: NA,", paste(unique(.sys_geog_levels$level), collapse = ", ")))
+  assertthat::assert_that(all(geogs %in% c(NA, names(.sys_entity_levels))),
+                          msg = paste("in check_gss_codes geogs must only contain: NA,", paste(unique(names(.sys_entity_levels)), collapse = ", ")))
   
   
   # other validations

@@ -26,8 +26,8 @@ get_gss_levels <- function(df_in,
   df_in <- df_in %>%
     rename("gss_code" = !!col_code)
   
-  
-  entity_lookup <- .sys_geog_levels
+  entity_levels <- .sys_entity_levels
+  known_entites <- unname(unlist(entity_levels))
   
   entities <- df_in %>%
     mutate(entity = substr(gss_code,1,3)) %>%
@@ -36,20 +36,18 @@ get_gss_levels <- function(df_in,
     pull()
   
   # check that fn can handle the geographies present
-  if (!all(entities %in% entity_lookup$entity_type)) {
-    print(entities[!entities %in% entity_lookup$entity_type])
+  if (!all(entities %in% known_entites)) {
+    print(entities[!entities %in% known_entites])
     stop("in get_gss_levels the data in df_in contains geography levels that the function can't handle (listed above)")
   }
   
   # If there are English regions (E12) present then W92 is a region unless E92 is also present (English regions + Wales is a common geography for the GLA to use)
   if ("E12" %in% entities & !"E92" %in% entities) {
-    entity_lookup <- entity_lookup %>% filter(entity_type != "W92")
+    entity_levels$country <- NULL
   }
   
-  levels <- filter(entity_lookup, entity_type %in% entities) %>%
-    select(level) %>%
-    unique() %>%
-    pull()
+  levels_TF <- lapply(entity_levels, function(x) any(entities %in% x))
+  levels <- names(entity_levels)[which(unlist(unname(levels_TF)))]
   
   return(levels)
 
