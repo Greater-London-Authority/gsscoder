@@ -59,7 +59,7 @@ check_gss_codes <- function(df_in,
       stop("in check_gss_codes the data in df_in contains geography levels that the function can't handle (listed above)")
     }
     
-    geogs <- get_gss_levels(df_in)
+    geogs <- get_geog_levels(df_in)
   }
   
   entities <- .sys_entity_levels[geogs] %>% unname() %>% unlist()
