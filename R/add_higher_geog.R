@@ -7,7 +7,7 @@
 #'  
 #' The name of the new column will be its geography level e.g. 'region'
 #'  
-#' The region code for Wales is coded as the country code ("W92000004) 
+#' The region code for Wales is coded as the country code ("W92000004") 
 #' 
 #' Throws an error if there are any GSS codes which were not operational at the 
 #' given date/year.
@@ -16,9 +16,9 @@
 #' @param col_code A string. The name of the column which contains gss codes (defaults to
 #'   \code{gss_code}).
 #' @param current_geog A string specifying the geography level of the \code{col_code} column. 
-#' Must be either 'lad' or 'region'.
+#' Must be either \code{'lad'} or \code{'region'}.
 #' @param higher_geog A string specifying the higher geography level to be added.
-#' Must be either 'region' or 'country'.
+#' Must be either \code{'region'} or \code{'country'}.
 #' @param gss_date A date object specifying the point in time that the gss codes 
 #' were/are operational. One of and only one of gss_date or gss_year must be defined. Defaults 
 #' to \code{NA})
@@ -59,13 +59,14 @@ add_higher_geog <- function(df_in,
     select(-start_date, -end_date) %>%
     unique()
   
-  # question: what position should the new codes be added to? last column?
   df_out <- left_join(df, lookup, by = setNames(current_geog, col_code)) %>%
     as.data.frame() 
   
   # check that df_out has same number of rows as df_in and one more column
-  nrow(df_in) == nrow(df_out)
-  all.equal(names(df_out), c(names(df_in), higher_geog))
+  assertthat::assert_that(nrow(df_in) == nrow(df_out),
+                          msg = "add_higher_geog output has gone wrong (number of rows)")
+  assertthat::assert_that(all.equal(names(df_out), c(names(df_in), higher_geog)),
+                          msg = "add_higher_geog output has gone wrong (column names)")
   
   return(df_out)
   

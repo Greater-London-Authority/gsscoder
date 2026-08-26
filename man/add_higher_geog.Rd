@@ -20,10 +20,10 @@ add_higher_geog(
 \code{gss_code}).}
 
 \item{current_geog}{A string specifying the geography level of the \code{col_code} column. 
-Must be either 'lad' or 'region'.}
+Must be either \code{'lad'} or \code{'region'}.}
 
 \item{higher_geog}{A string specifying the higher geography level to be added.
-Must be either 'region' or 'country'.}
+Must be either \code{'region'} or \code{'country'}.}
 
 \item{gss_date}{A date object specifying the point in time that the gss codes 
 were/are operational. One of and only one of gss_date or gss_year must be defined. Defaults 
@@ -45,7 +45,7 @@ Currently covers LADs, regions, and countries.
  
 The name of the new column will be its geography level e.g. 'region'
  
-The region code for Wales is coded as the country code ("W92000004) 
+The region code for Wales is coded as the country code ("W92000004") 
 
 Throws an error if there are any GSS codes which were not operational at the 
 given date/year.

@@ -10,7 +10,7 @@
 #' @param col_code A string. The name of the column which contains gss codes (defaults to
 #'   \code{gss_code}).
 #'
-#' @return A list of one or more of the following strings: "lad", "county", "region" or "country"
+#' @return A list of one or more of the following strings: \code{"lad"}, \code{"county"}, \code{"region"} or \code{"country"}
 #' 
 #' @import dplyr
 #' @importFrom assertthat assert_that

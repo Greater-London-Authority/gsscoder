@@ -13,7 +13,7 @@ get_geog_levels(df_in, col_code = "gss_code")
 \code{gss_code}).}
 }
 \value{
-A list of one or more of the following strings: "lad", "county", "region" or "country"
+A list of one or more of the following strings: \code{"lad"}, \code{"county"}, \code{"region"} or \code{"country"}
 }
 \description{
 Returns a list of strings describing the geography levels present in the data.

@@ -44,7 +44,7 @@ recode_gss <- function(df_in,
   # assign code changes to new variable as it will be altered if the recoding is going back in time. 
   code_changes <- .sys_code_changes 
   
-  # names are for checking that none of the columns contain LA names
+  # names are for checking that none of the df_in columns contain LA names
   la_names <- .sys_all_codes_dates %>% 
     select(gss_name) %>% unique() %>% pull()
   
