@@ -14,7 +14,7 @@
 #' @param col_code A string. The column which contains gss codes (defaults to
 #'   \code{gss_code}).
 #' @param col_data A string or character vector. The column(s) that contain the
-#'   data to be aggregated. Defaults to last column of input dataframe. At least 
+#'   data to be aggregated. Defaults to 'value'. At least 
 #'   one data column must be specified. 
 #' @param fun Character. Function to be applied in aggregating data. Either 'sum'
 #'   or 'mean'. Default \code{'sum'}.
@@ -41,11 +41,11 @@ recode_gss <- function(df_in,
                        recode_to_year,
                        aggregate_data = TRUE) {
   
-  # assign code changes to new variable as it will be altered below. 
-  code_changes <- lad_code_changes # lad_code_changes is an internal package data variable stored in R/sysdata.rda
+  # assign code changes to new variable as it will be altered if the recoding is going back in time. 
+  code_changes <- .sys_code_changes 
   
-  # names are for checking that none of the columns contain LA names
-  la_names <- all_lad_codes_dates %>% # all_lad_codes_dates is an internal package data variable stored in R/sysdata.rda
+  # names are for checking that none of the df_in columns contain LA names
+  la_names <- .sys_all_codes_dates %>% 
     select(gss_name) %>% unique() %>% pull()
   
   
@@ -197,7 +197,7 @@ recode_gss <- function(df_in,
                           msg = "in recode_gss, recode_from_year must be 2008 or later")
   
   
-  database_year <- database_date %>% format('%Y') %>% as.numeric() # database_date is an internal package data variable stored in R/sysdata.rda
+  database_year <- .sys_database_date %>% format('%Y') %>% as.numeric()
   assertthat::assert_that(recode_from_year <= database_year,
                           msg = paste0("in recode_gss, recode_from_year cannot be later than the year of the code change database which is ",
                                        database_year, ". You may need to update the database."))
@@ -212,8 +212,7 @@ recode_gss <- function(df_in,
   
   for(i in length(col_data)){
     
-    #TODO check that df_in is a dataframe
-    assertthat::assert_that(col_data[i] %in% names(df_in),
+        assertthat::assert_that(col_data[i] %in% names(df_in),
                             msg = paste0("in recode_gss_codes, specified col_data'", col_data[i],
                                         "' not in input dataframe"))
   }

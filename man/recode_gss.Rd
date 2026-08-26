@@ -20,20 +20,20 @@ recode_gss(
 \item{col_code}{A string. The column which contains gss codes (defaults to
 \code{gss_code}).}
 
-\item{fun}{Character Function to be applied in aggregating data. Either 'sum'
+\item{col_data}{A string or character vector. The column(s) that contain the
+data to be aggregated. Defaults to 'value'. At least 
+one data column must be specified.}
+
+\item{fun}{Character. Function to be applied in aggregating data. Either 'sum'
 or 'mean'. Default \code{'sum'}.}
 
 \item{recode_from_year}{Numeric. Year of geography of the input dataframe.}
 
 \item{recode_to_year}{Numeric. Conform to geography in which year.}
 
-\item{aggregate_data}{Logical. If set to true multiple instances of the same
+\item{aggregate_data}{Logical. If set to true multiple instances of the same 'recoded to'
 gss code will be aggregated using the function specified in \code{fun} parameter.
 Default to \code{TRUE}.}
-
-\item{col_dataA}{string or character vector. The column(s) that contain the
-data to be aggregated. Defaults to last column of input dataframe. At least 
-one data column must be specified.}
 }
 \value{
 The input dataframe with gss codes changed and data aggregated

@@ -1,6 +1,9 @@
 data-raw/*.csv
 data-raw/*.rds
+data-raw/Code_History_Database*
+temp/*
 
+*.DS_Store
 .Rproj.user
 .Rhistory
 .RData

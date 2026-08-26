@@ -1,4 +1,4 @@
-codes <- test_codes # internal package variable stored in R/sysdata.rda and created in data-raw/testthat_data.R
+codes <- .sys_test_codes 
 
 
 expect_2008 <- expand.grid(gss_code = codes$y2008$gss_code, 

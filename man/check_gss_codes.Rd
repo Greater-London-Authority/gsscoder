@@ -11,6 +11,7 @@ check_gss_codes(
   gss_date = NA,
   gss_year = NA,
   expect_complete = FALSE,
+  geogs = NA,
   include_wales = FALSE
 )
 }
@@ -28,14 +29,19 @@ or gss_year can be defined. Defaults to \code{NA})}
 Equivalent to setting gss_date to 31st December of that year. Only one of gss_date 
 or gss_year can be defined. Defaults to \code{NA})}
 
-\item{expect_complete}{Logical. If set to TRUE a warning will be given if there are 
+\item{expect_complete}{Logical. If set to TRUE an error will be given if there are 
 codes which are not in df_in but were operational on the date/year given. Defaults to \code{FALSE})}
 
-\item{include_wales}{Logical. If set to TRUE when expect_complete is TRUE, warnings
+\item{geogs}{NA, string or list of strings. Specifies the level(s) of geography expected. If NA,
+the function will expect all geography levels where there is at least one example present in the data.
+Allowed strings are: \code{"lad"}, \code{"region"}, \code{"country"}. Defaults to \code{"lad"}.
+If include_wales is TRUE and "region" is specified then Wales will be counted as a region.}
+
+\item{include_wales}{Logical. If set to TRUE when expect_complete is TRUE, an error
 will be given for missing Welsh codes as well as English ones. Defaults to \code{FALSE})}
 }
 \value{
-Does't return anything
+Doesn't return anything
 }
 \description{
 Checks that there are no codes in the data which weren't live on that date,
@@ -43,5 +49,5 @@ and can also check for completeness covering England and optionally Wales.
 }
 \details{
 Throws an error if there are codes present which weren't live on the give date,
-and warns for any missing codes if expect_complete is set to TRUE.
+or if there are any missing codes if expect_complete is set to TRUE.
 }
